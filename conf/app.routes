@@ -1,3 +1,2 @@
-# microservice specific routes
-
-GET        /hello-world             uk.gov.hmrc.hecstubs.controllers.MicroserviceHelloWorldController.hello
+## citizen details
+GET       /citizen-details/nino-no-suffix/:ninoNoSuffix        uk.gov.hmrc.hecstubs.controllers.CitizenDetailsController.citizenDetails(ninoNoSuffix)
