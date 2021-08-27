@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.hecstubs.controllers
+package uk.gov.hmrc.hecstubs.models.accountOverviewDetails
 
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import play.api.libs.json.{Json, OWrites}
 
-@Singleton()
-class MicroserviceHelloWorldController @Inject() (cc: ControllerComponents) extends BackendController(cc) {
+final case class IndividualAccountOverview(utr: SAUTR, taxYear: String, returnStatus: ReturnStatus)
 
-  def hello(): Action[AnyContent] = Action.async { _ =>
-    Future.successful(Ok("Hello world"))
-  }
+object IndividualAccountOverview {
+
+  implicit val writes: OWrites[IndividualAccountOverview] = Json.writes[IndividualAccountOverview]
+
 }
