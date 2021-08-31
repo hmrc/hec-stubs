@@ -22,7 +22,7 @@ import cats.syntax.apply._
 import com.google.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.InvalidCode._
+import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ErrorCode._
 import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ReturnStatus.ReturnFound
 import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.{Environment, ErrorResponse, ErrorResult}
 import uk.gov.hmrc.hecstubs.models.companyAccountingPeriod.{AccountingPeriod, CTUTR, CompanyAccountingPeriod}

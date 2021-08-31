@@ -25,7 +25,6 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.hecstubs.controllers.TestData._
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.InvalidCode.{InvalidCTUTR, InvalidCorrelationId, InvalidEndDate, InvalidStartDate}
 
 import java.util.UUID
 import scala.concurrent.Future
@@ -101,9 +100,9 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
 
         "One invalid parameter" when {
 
-          "ctutr is unvalid" in {
+          "ctutr is invalid" in {
 
-            val expectedJson: JsValue = badJsonResponse((InvalidCTUTR, "Invalid parameter ctutr."))
+            val expectedJson: JsValue = badJsonResponse(("INVALID_CTUTR", "Invalid parameter ctutr."))
 
             inValidCtUtr.map { invUtr =>
               val result = controller.accountingPeriod(invUtr, validStartDate, validEndDate)(
@@ -116,7 +115,7 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
 
           "start Date in query param is Invalid" in {
 
-            val expectedJson: JsValue = badJsonResponse((InvalidStartDate, "Invalid query parameter startDate."))
+            val expectedJson: JsValue = badJsonResponse(("INVALID_START_DATE", "Invalid query parameter startDate."))
 
             inValidStartDate.map { inStartDate =>
               val result = controller.accountingPeriod(validCtutr, inStartDate, validEndDate)(
@@ -130,7 +129,7 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
 
           "End  Date in query param is Invalid" in {
 
-            val expectedJson: JsValue = badJsonResponse((InvalidEndDate, "Invalid query parameter endDate."))
+            val expectedJson: JsValue = badJsonResponse(("INVALID_END_DATE", "Invalid query parameter endDate."))
 
             inValidEndDate.map { inEndDate =>
               val result = controller.accountingPeriod(validCtutr, validStartDate, inEndDate)(
@@ -160,7 +159,7 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
           }
 
           "Invalid CorrelationId is  passed in the header" in {
-            val expectedJson           = badJsonResponse((InvalidCorrelationId, "Invalid header CorrelationId."))
+            val expectedJson           = badJsonResponse(("INVALID_CORRELATIONID", "Invalid header CorrelationId."))
             val result: Future[Result] =
               controller.accountingPeriod(validCtutr, validStartDate, validEndDate)(
                 fakeRequest("live", "correlationid")
@@ -177,8 +176,8 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
 
             val expectedJson: JsValue =
               badJsonResponse(
-                (InvalidCTUTR, "Invalid parameter ctutr."),
-                (InvalidStartDate, "Invalid query parameter startDate.")
+                ("INVALID_CTUTR", "Invalid parameter ctutr."),
+                ("INVALID_START_DATE", "Invalid query parameter startDate.")
               )
 
             val result: Future[Result] =
@@ -192,8 +191,8 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
           "ctutr and endDate are invalid" in {
 
             val expectedJson: JsValue = badJsonResponse(
-              (InvalidCTUTR, "Invalid parameter ctutr."),
-              (InvalidEndDate, "Invalid query parameter endDate.")
+              ("INVALID_CTUTR", "Invalid parameter ctutr."),
+              ("INVALID_END_DATE", "Invalid query parameter endDate.")
             )
 
             val result: Future[Result] =
@@ -207,8 +206,8 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
           "startDate and endDate are invalid" in {
 
             val expectedJson: JsValue = badJsonResponse(
-              (InvalidStartDate, "Invalid query parameter startDate."),
-              (InvalidEndDate, "Invalid query parameter endDate.")
+              ("INVALID_START_DATE", "Invalid query parameter startDate."),
+              ("INVALID_END_DATE", "Invalid query parameter endDate.")
             )
 
             val result: Future[Result] =
@@ -222,8 +221,8 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
           "ctutr and CorrelationId  are invalid" in {
 
             val expectedJson: JsValue = badJsonResponse(
-              (InvalidCTUTR, "Invalid parameter ctutr."),
-              (InvalidCorrelationId, "Invalid header CorrelationId.")
+              ("INVALID_CTUTR", "Invalid parameter ctutr."),
+              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
             )
 
             val result: Future[Result] =
@@ -237,8 +236,8 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
           "start date and CorrelationId  are invalid" in {
 
             val expectedJson: JsValue = badJsonResponse(
-              (InvalidStartDate, "Invalid query parameter startDate."),
-              (InvalidCorrelationId, "Invalid header CorrelationId.")
+              ("INVALID_START_DATE", "Invalid query parameter startDate."),
+              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
             )
 
             val result: Future[Result] =
@@ -252,8 +251,8 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
           "end date and CorrelationId  are invalid" in {
 
             val expectedJson: JsValue = badJsonResponse(
-              (InvalidEndDate, "Invalid query parameter endDate."),
-              (InvalidCorrelationId, "Invalid header CorrelationId.")
+              ("INVALID_END_DATE", "Invalid query parameter endDate."),
+              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
             )
 
             val result: Future[Result] =
@@ -271,9 +270,9 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
           "ctutr, startDate and end date are invalid" in {
 
             val expectedJson: JsValue = badJsonResponse(
-              (InvalidCTUTR, "Invalid parameter ctutr."),
-              (InvalidStartDate, "Invalid query parameter startDate."),
-              (InvalidEndDate, "Invalid query parameter endDate.")
+              ("INVALID_CTUTR", "Invalid parameter ctutr."),
+              ("INVALID_START_DATE", "Invalid query parameter startDate."),
+              ("INVALID_END_DATE", "Invalid query parameter endDate.")
             )
 
             val result: Future[Result] =
@@ -288,9 +287,9 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
           "ctutr, startDate and correlationId are invalid" in {
 
             val expectedJson: JsValue = badJsonResponse(
-              (InvalidCTUTR, "Invalid parameter ctutr."),
-              (InvalidStartDate, "Invalid query parameter startDate."),
-              (InvalidCorrelationId, "Invalid header CorrelationId.")
+              ("INVALID_CTUTR", "Invalid parameter ctutr."),
+              ("INVALID_START_DATE", "Invalid query parameter startDate."),
+              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
             )
 
             val result: Future[Result] =
@@ -305,10 +304,10 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
         "four invalid parameters" when {
           "ctutr, startDate, endDate and corelationid are invalid" in {
             val expectedJson: JsValue = badJsonResponse(
-              (InvalidCTUTR, "Invalid parameter ctutr."),
-              (InvalidStartDate, "Invalid query parameter startDate."),
-              (InvalidEndDate, "Invalid query parameter endDate."),
-              (InvalidCorrelationId, "Invalid header CorrelationId.")
+              ("INVALID_CTUTR", "Invalid parameter ctutr."),
+              ("INVALID_START_DATE", "Invalid query parameter startDate."),
+              ("INVALID_END_DATE", "Invalid query parameter endDate."),
+              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
             )
 
             val result: Future[Result] =

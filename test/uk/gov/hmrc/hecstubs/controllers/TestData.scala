@@ -17,7 +17,6 @@
 package uk.gov.hmrc.hecstubs.controllers
 
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.{ErrorResponse, ErrorResult, InvalidCode}
 
 object TestData {
 
@@ -43,12 +42,18 @@ object TestData {
                                             |}
                                             |""".stripMargin)
 
-  def badJsonResponse(codeWithMessages: (InvalidCode, String)*) = {
+  def badJsonResponse(codeWithMessages: (String, String)*) = {
     val errorObjects = codeWithMessages.toList
       .map { case (code, reason) =>
-        ErrorResult(code, s"Submission has not passed validation. $reason")
+        s"""
+           |{
+           |"code": "$code",
+           |"reason": "Submission has not passed validation. $reason"
+           |}
+           |""".stripMargin
       }
-    Json.toJson(ErrorResponse(errorObjects))
+      .mkString(",")
+    Json.parse(s"""{ "failures" : [ $errorObjects ] } """)
   }
 
 }

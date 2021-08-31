@@ -19,17 +19,17 @@ package uk.gov.hmrc.hecstubs.util
 import cats.data.Validated.Valid
 import cats.data.{Validated, ValidatedNel}
 import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ErrorResult
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.InvalidCode.InvalidCorrelationId
+import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ErrorCode.InvalidCorrelationId
 
 import java.util.UUID
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 object ValidationUtils {
   def correlationIdValidation(correlationId: String): ValidatedNel[ErrorResult, String] = Try(
     UUID.fromString(correlationId)
-  ).toOption match {
-    case Some(id) => Valid(id.toString)
-    case None     =>
+  ) match {
+    case Success(id) => Valid(id.toString)
+    case Failure(_)  =>
       Validated.invalidNel(
         ErrorResult(InvalidCorrelationId, "Submission has not passed validation. Invalid header CorrelationId.")
       )

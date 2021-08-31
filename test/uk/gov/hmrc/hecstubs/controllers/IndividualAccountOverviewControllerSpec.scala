@@ -25,7 +25,6 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.hecstubs.controllers.TestData._
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.InvalidCode._
 
 import java.util.UUID
 import scala.concurrent.Future
@@ -63,7 +62,7 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
 
           "utr is Invalid" in {
 
-            val expectedJson: JsValue = badJsonResponse((InvalidUTR, "Invalid parameter utr."))
+            val expectedJson: JsValue = badJsonResponse(("INVALID_UTR", "Invalid parameter utr."))
 
             inValidUtr.map { invUtr =>
               val result = controller.individualAccountOverview(invUtr, validTaxYear)(
@@ -77,7 +76,7 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
 
           "taxYear is Invalid" in {
 
-            val expectedJson: JsValue = badJsonResponse((InvalidTaxYear, "Invalid parameter taxYear."))
+            val expectedJson: JsValue = badJsonResponse(("INVALID_TAXYEAR", "Invalid parameter taxYear."))
             inValidTaxYear.map { inTaxYear =>
               val result = controller.individualAccountOverview(validUtr, inTaxYear)(
                 fakeRequest("live", UUID.randomUUID().toString)
@@ -107,7 +106,7 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
           }
 
           "Invalid CorrelationId is  passed in the header" in {
-            val expectedJson           = badJsonResponse((InvalidCorrelationId, "Invalid header CorrelationId."))
+            val expectedJson           = badJsonResponse(("INVALID_CORRELATIONID", "Invalid header CorrelationId."))
             val result: Future[Result] =
               controller.individualAccountOverview(validUtr, validTaxYear)(
                 fakeRequest("live", "correlationid")
@@ -124,7 +123,10 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
           "utr and tax Year are invalid" in {
 
             val expectedJson: JsValue  =
-              badJsonResponse((InvalidUTR, "Invalid parameter utr."), (InvalidTaxYear, "Invalid parameter taxYear."))
+              badJsonResponse(
+                ("INVALID_UTR", "Invalid parameter utr."),
+                ("INVALID_TAXYEAR", "Invalid parameter taxYear.")
+              )
             val result: Future[Result] =
               controller.individualAccountOverview(inValidUtr(0), inValidTaxYear(0))(
                 fakeRequest("live", UUID.randomUUID().toString)
@@ -137,8 +139,8 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
           "utr and CorrelationId are invalid" in {
 
             val expectedJson: JsValue = badJsonResponse(
-              (InvalidUTR, "Invalid parameter utr."),
-              (InvalidCorrelationId, "Invalid header CorrelationId.")
+              ("INVALID_UTR", "Invalid parameter utr."),
+              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
             )
 
             val result: Future[Result] =
@@ -153,8 +155,8 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
           "taxYear and CorrelationId are invalid" in {
 
             val expectedJson: JsValue = badJsonResponse(
-              (InvalidTaxYear, "Invalid parameter taxYear."),
-              (InvalidCorrelationId, "Invalid header CorrelationId.")
+              ("INVALID_TAXYEAR", "Invalid parameter taxYear."),
+              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
             )
 
             val result: Future[Result] =
@@ -173,9 +175,9 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
           "utr , tax Year and correlationId  are invalid" in {
 
             val expectedJson: JsValue = badJsonResponse(
-              (InvalidUTR, "Invalid parameter utr."),
-              (InvalidTaxYear, "Invalid parameter taxYear."),
-              (InvalidCorrelationId, "Invalid header CorrelationId.")
+              ("INVALID_UTR", "Invalid parameter utr."),
+              ("INVALID_TAXYEAR", "Invalid parameter taxYear."),
+              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
             )
 
             val result: Future[Result] =

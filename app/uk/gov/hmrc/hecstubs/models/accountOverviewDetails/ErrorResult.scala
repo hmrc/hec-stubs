@@ -18,7 +18,7 @@ package uk.gov.hmrc.hecstubs.models.accountOverviewDetails
 
 import play.api.libs.json.{Json, OWrites}
 
-final case class ErrorResult(code: InvalidCode, reason: String)
+final case class ErrorResult(code: ErrorCode, reason: String)
 
 object ErrorResult {
 
