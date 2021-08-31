@@ -36,6 +36,8 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
     extends BackendController(cc)
     with Logging {
 
+  val message = "Submission has not passed validation."
+
   /**
     * fetch the individual account overview based on utr and tx year
     * @param utr
@@ -89,14 +91,14 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
 
     val utrValidation: ValidatedNel[ErrorResult, SAUTR] = {
       if (utr.matches(utrRegex)) Valid(SAUTR(utr))
-      else Validated.invalidNel(ErrorResult(InvalidUTR, "Submission has not passed validation. Invalid parameter utr."))
+      else Validated.invalidNel(ErrorResult(InvalidUTR, s"$message Invalid parameter utr."))
     }
 
     val taxYearValidation: ValidatedNel[ErrorResult, String] = {
       if (taxYear.matches(yearRegex)) Valid(taxYear)
       else
         Validated.invalidNel(
-          ErrorResult(InvalidTaxYear, "Submission has not passed validation. Invalid parameter taxYear.")
+          ErrorResult(InvalidTaxYear, s"$message Invalid parameter taxYear.")
         )
     }
     val correlationIdValidation: ValidatedNel[ErrorResult, String] = Try(
@@ -105,7 +107,7 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
       case Some(id) => Valid(id.toString)
       case None     =>
         Validated.invalidNel(
-          ErrorResult(InvalidCorrelationId, "Submission has not passed validation. Invalid header CorrelationId.")
+          ErrorResult(InvalidCorrelationId, s"$message Invalid header CorrelationId.")
         )
 
     }
