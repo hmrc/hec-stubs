@@ -39,6 +39,9 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
   def fakeRequestWithoutCorrelationId(environment: String) =
     FakeRequest().withMethod("GET").withHeaders(("Environment", environment))
 
+  def fakeRequestWithoutEnv() =
+    FakeRequest().withMethod("GET")
+
   private val controller = new AccountingPeriodController(mockCC)
 
   val validCtutr   = "1234567890"
@@ -156,6 +159,15 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
                 fakeRequest("", UUID.randomUUID().toString)
               )
             status(result) shouldBe Status.BAD_REQUEST
+          }
+
+          "Environment header is missing" in {
+            val result: Future[Result] =
+              controller.accountingPeriod(validCtutr, validStartDate, validEndDate)(
+                fakeRequestWithoutEnv()
+              )
+            status(result) shouldBe Status.BAD_REQUEST
+
           }
 
           "Invalid CorrelationId is  passed in the header" in {

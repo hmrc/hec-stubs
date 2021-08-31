@@ -36,6 +36,9 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
   def fakeRequest(environment: String, correlationId: String) =
     FakeRequest().withMethod("GET").withHeaders(("Environment", environment), ("CorrelationId", correlationId))
 
+  def fakeRequestWithoutEnv(correlationId: String) =
+    FakeRequest().withMethod("GET").withHeaders(("CorrelationId", correlationId))
+
   private val controller = new IndividualAccountOverviewController(mockCC)
 
   val validUtr   = "1234567890"
@@ -100,6 +103,15 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
             val result: Future[Result] =
               controller.individualAccountOverview(validUtr, validTaxYear)(
                 fakeRequest("", UUID.randomUUID().toString)
+              )
+            status(result) shouldBe Status.BAD_REQUEST
+
+          }
+
+          "Environment header is missing" in {
+            val result: Future[Result] =
+              controller.individualAccountOverview(validUtr, validTaxYear)(
+                fakeRequestWithoutEnv(UUID.randomUUID().toString)
               )
             status(result) shouldBe Status.BAD_REQUEST
 

@@ -68,7 +68,7 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
         }
       case None    =>
         logger.info(
-          s"Call failed  for Self-Assessment Individual Account Overview as Environment as Environment in header is invalid"
+          s"Call failed  for Self-Assessment Individual Account Overview as Environment in header is missing"
         )
         BadRequest
     }
