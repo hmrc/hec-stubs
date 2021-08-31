@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.hecstubs.models.accountOverviewDetails
 
-import play.api.libs.json.{JsString, Writes}
-
 sealed trait Environment extends Product with Serializable {
   def value: String
 }
@@ -31,9 +29,6 @@ object Environment {
     case "clone" => Some(Clone)
     case "live"  => Some(Live)
     case _       => None
-  }
-  implicit val writes: Writes[Environment]                       = Writes { status =>
-    JsString(status.value)
   }
 
 }

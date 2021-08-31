@@ -36,7 +36,9 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
     extends BackendController(cc)
     with Logging {
 
-  val message = "Submission has not passed validation."
+  val message   = "Submission has not passed validation."
+  val utrRegex  = "^[0-9]{10}$"
+  val yearRegex = "^[0-9]{4}$"
 
   /**
     * fetch the individual account overview based on utr and tx year
@@ -86,8 +88,6 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
     taxYear: String,
     correlationId: String
   ): ValidatedNel[ErrorResult, IndividualAccountOverview] = {
-    val utrRegex  = "^[0-9]{10}$"
-    val yearRegex = "^[0-9]{4}$"
 
     val utrValidation: ValidatedNel[ErrorResult, SAUTR] = {
       if (utr.matches(utrRegex)) Valid(SAUTR(utr))

@@ -20,12 +20,12 @@ import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{AnyContentAsEmpty, Result}
-import play.api.test.Helpers.{status, stubControllerComponents}
-import play.api.test.{FakeHeaders, FakeRequest}
+import play.api.libs.json.JsValue
+import play.api.mvc.Result
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.hecstubs.controllers.Testdata._
+import uk.gov.hmrc.hecstubs.controllers.TestData._
+import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.InvalidCode._
 
 import java.util.UUID
 import scala.concurrent.Future
@@ -34,14 +34,8 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
 
   lazy val mockCC = stubControllerComponents()
 
-  def fakeRequest(environment: String, correlationId: String) = FakeRequest(
-    method = "GET",
-    uri = "/",
-    headers = FakeHeaders(
-      Seq(("Content-type", "application/json"), ("Environment", environment), ("CorrelationId", correlationId))
-    ),
-    body = AnyContentAsEmpty
-  )
+  def fakeRequest(environment: String, correlationId: String) =
+    FakeRequest().withMethod("GET").withHeaders(("Environment", environment), ("CorrelationId", correlationId))
 
   private val controller = new IndividualAccountOverviewController(mockCC)
 
@@ -57,17 +51,10 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
 
       "return 200 and return the correct response" in {
 
-        val expectedJson: JsValue  = Json.parse("""
-            |{
-            |    "utr": "1234567890",
-            |    "taxYear": "2021",
-            |    "returnStatus": "Return Found"
-            |}
-            |""".stripMargin)
         val result: Future[Result] =
           controller.individualAccountOverview(validUtr, validTaxYear)(fakeRequest("live", UUID.randomUUID().toString))
         status(result) shouldBe Status.OK
-        contentAsJson(result) mustBe expectedJson
+        contentAsJson(result) mustBe expectedAccountOverviewJson
       }
 
       "return bad request" when {
@@ -76,7 +63,7 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
 
           "utr is Invalid" in {
 
-            val expectedJson: JsValue = badJsonResponse("INVALID_UTR", "Invalid parameter utr.")
+            val expectedJson: JsValue = badJsonResponse((InvalidUTR, "Invalid parameter utr."))
 
             inValidUtr.map { invUtr =>
               val result = controller.individualAccountOverview(invUtr, validTaxYear)(
@@ -90,7 +77,7 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
 
           "taxYear is Invalid" in {
 
-            val expectedJson: JsValue = badJsonResponse("INVALID_TAXYEAR", "Invalid parameter taxYear.")
+            val expectedJson: JsValue = badJsonResponse((InvalidTaxYear, "Invalid parameter taxYear."))
             inValidTaxYear.map { inTaxYear =>
               val result = controller.individualAccountOverview(validUtr, inTaxYear)(
                 fakeRequest("live", UUID.randomUUID().toString)
@@ -120,7 +107,7 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
           }
 
           "Invalid CorrelationId is  passed in the header" in {
-            val expectedJson           = badJsonResponse("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
+            val expectedJson           = badJsonResponse((InvalidCorrelationId, "Invalid header CorrelationId."))
             val result: Future[Result] =
               controller.individualAccountOverview(validUtr, validTaxYear)(
                 fakeRequest("live", "correlationid")
@@ -137,12 +124,7 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
           "utr and tax Year are invalid" in {
 
             val expectedJson: JsValue  =
-              badJsonResponseTwo(
-                "INVALID_UTR",
-                "INVALID_TAXYEAR",
-                "Invalid parameter utr.",
-                "Invalid parameter taxYear."
-              )
+              badJsonResponse((InvalidUTR, "Invalid parameter utr."), (InvalidTaxYear, "Invalid parameter taxYear."))
             val result: Future[Result] =
               controller.individualAccountOverview(inValidUtr(0), inValidTaxYear(0))(
                 fakeRequest("live", UUID.randomUUID().toString)
@@ -154,13 +136,11 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
 
           "utr and CorrelationId are invalid" in {
 
-            val expectedJson: JsValue  =
-              badJsonResponseTwo(
-                "INVALID_UTR",
-                "INVALID_CORRELATIONID",
-                "Invalid parameter utr.",
-                "Invalid header CorrelationId."
-              )
+            val expectedJson: JsValue = badJsonResponse(
+              (InvalidUTR, "Invalid parameter utr."),
+              (InvalidCorrelationId, "Invalid header CorrelationId.")
+            )
+
             val result: Future[Result] =
               controller.individualAccountOverview(inValidUtr(0), validTaxYear)(
                 fakeRequest("live", "correlationId")
@@ -172,13 +152,11 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
 
           "taxYear and CorrelationId are invalid" in {
 
-            val expectedJson: JsValue  =
-              badJsonResponseTwo(
-                "INVALID_TAXYEAR",
-                "INVALID_CORRELATIONID",
-                "Invalid parameter taxYear.",
-                "Invalid header CorrelationId."
-              )
+            val expectedJson: JsValue = badJsonResponse(
+              (InvalidTaxYear, "Invalid parameter taxYear."),
+              (InvalidCorrelationId, "Invalid header CorrelationId.")
+            )
+
             val result: Future[Result] =
               controller.individualAccountOverview(validUtr, inValidTaxYear(0))(
                 fakeRequest("live", "correlationId")
@@ -194,15 +172,12 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
 
           "utr , tax Year and correlationId  are invalid" in {
 
-            val expectedJson: JsValue  =
-              badJsonResponseThree(
-                "INVALID_UTR",
-                "INVALID_TAXYEAR",
-                "INVALID_CORRELATIONID",
-                "Invalid parameter utr.",
-                "Invalid parameter taxYear.",
-                "Invalid header CorrelationId."
-              )
+            val expectedJson: JsValue = badJsonResponse(
+              (InvalidUTR, "Invalid parameter utr."),
+              (InvalidTaxYear, "Invalid parameter taxYear."),
+              (InvalidCorrelationId, "Invalid header CorrelationId.")
+            )
+
             val result: Future[Result] =
               controller.individualAccountOverview(inValidUtr(0), inValidTaxYear(0))(
                 fakeRequest("live", "correlationId")
