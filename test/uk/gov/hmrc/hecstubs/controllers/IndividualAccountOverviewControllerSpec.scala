@@ -25,16 +25,18 @@ import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.Helpers.{status, stubControllerComponents}
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.api.test.Helpers._
+import uk.gov.hmrc.hecstubs.controllers.Testdata._
 
 import java.util.UUID
 import scala.concurrent.Future
-class AccountOverviewDetailsSpec extends AnyWordSpec with Matchers {
+
+class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers {
 
   lazy val mockCC = stubControllerComponents()
 
   def fakeRequest(environment: String, correlationId: String) = FakeRequest(
     method = "GET",
-    uri = "/individuals/self-assessment/account-overview/1234567890/2021",
+    uri = "/",
     headers = FakeHeaders(
       Seq(("Content-type", "application/json"), ("Environment", environment), ("CorrelationId", correlationId))
     ),
@@ -44,62 +46,10 @@ class AccountOverviewDetailsSpec extends AnyWordSpec with Matchers {
   private val controller = new IndividualAccountOverviewController(mockCC)
 
   val validUtr   = "1234567890"
-  val inValidUtr = "12345678901"
+  val inValidUtr = List("12345678901", "ABC1234567", "AB675^^&hg")
 
   val validTaxYear   = "2021"
   val inValidTaxYear = List("202", "20188", "12", "0", "")
-
-  def badJsonResponse(code: String, message: String) = Json.parse(s"""
-                                                                    |{
-                                                                    |  "failures": [
-                                                                    |    {
-                                                                    |      "code": "$code",
-                                                                    |      "reason": "Submission has not passed validation. $message"
-                                                                    |    }
-                                                                     |  ]
-                                                                    |}
-                                                                    |""".stripMargin)
-
-  def badJsonResponseTwo(code1: String, code2: String, message1: String, message2: String) = Json.parse(s"""
-                                                                     |{
-                                                                     |  "failures": [
-                                                                     |    {
-                                                                     |      "code": "$code1",
-                                                                     |      "reason": "Submission has not passed validation. $message1"
-                                                                     |    },
-                                                                     |     {
-                                                                     |      "code": "$code2",
-                                                                     |      "reason": "Submission has not passed validation. $message2"
-                                                                     |    }
-                                                                     |  ]
-                                                                     |}
-                                                                     |""".stripMargin)
-
-  def badJsonResponseThree(
-    code1: String,
-    code2: String,
-    code3: String,
-    message1: String,
-    message2: String,
-    message3: String
-  ) = Json.parse(s"""
-                                      |{
-                                      |  "failures": [
-                                      |    {
-                                      |      "code": "$code1",
-                                      |      "reason": "Submission has not passed validation. $message1"
-                                      |    },
-                                      |     {
-                                      |      "code": "$code2",
-                                      |      "reason": "Submission has not passed validation. $message2"
-                                      |    },
-                                      |    {
-                                      |      "code": "$code3",
-                                      |      "reason": "Submission has not passed validation. $message3"
-                                      |    }
-                                      |  ]
-                                      |}
-                                      |""".stripMargin)
 
   "IndividualAccountOverviewController" when {
 
@@ -126,13 +76,15 @@ class AccountOverviewDetailsSpec extends AnyWordSpec with Matchers {
 
           "utr is Invalid" in {
 
-            val expectedJson: JsValue  = badJsonResponse("INVALID_UTR", "Invalid parameter utr.")
-            val result: Future[Result] =
-              controller.individualAccountOverview(inValidUtr, validTaxYear)(
+            val expectedJson: JsValue = badJsonResponse("INVALID_UTR", "Invalid parameter utr.")
+
+            inValidUtr.map { invUtr =>
+              val result = controller.individualAccountOverview(invUtr, validTaxYear)(
                 fakeRequest("live", UUID.randomUUID().toString)
               )
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) mustBe expectedJson
+              status(result) shouldBe Status.BAD_REQUEST
+              contentAsJson(result) mustBe expectedJson
+            }
 
           }
 
@@ -151,7 +103,7 @@ class AccountOverviewDetailsSpec extends AnyWordSpec with Matchers {
 
           "Wrong Environment value is  passed in the header" in {
             val result: Future[Result] =
-              controller.individualAccountOverview(inValidUtr, validTaxYear)(
+              controller.individualAccountOverview(validUtr, validTaxYear)(
                 fakeRequest("env", UUID.randomUUID().toString)
               )
             status(result) shouldBe Status.BAD_REQUEST
@@ -160,7 +112,7 @@ class AccountOverviewDetailsSpec extends AnyWordSpec with Matchers {
 
           "No Environment value is  passed in the header" in {
             val result: Future[Result] =
-              controller.individualAccountOverview(inValidUtr, validTaxYear)(
+              controller.individualAccountOverview(validUtr, validTaxYear)(
                 fakeRequest("", UUID.randomUUID().toString)
               )
             status(result) shouldBe Status.BAD_REQUEST
@@ -192,7 +144,7 @@ class AccountOverviewDetailsSpec extends AnyWordSpec with Matchers {
                 "Invalid parameter taxYear."
               )
             val result: Future[Result] =
-              controller.individualAccountOverview(inValidUtr, inValidTaxYear(0))(
+              controller.individualAccountOverview(inValidUtr(0), inValidTaxYear(0))(
                 fakeRequest("live", UUID.randomUUID().toString)
               )
             status(result) shouldBe Status.BAD_REQUEST
@@ -210,7 +162,7 @@ class AccountOverviewDetailsSpec extends AnyWordSpec with Matchers {
                 "Invalid header CorrelationId."
               )
             val result: Future[Result] =
-              controller.individualAccountOverview(inValidUtr, validTaxYear)(
+              controller.individualAccountOverview(inValidUtr(0), validTaxYear)(
                 fakeRequest("live", "correlationId")
               )
             status(result) shouldBe Status.BAD_REQUEST
@@ -252,7 +204,7 @@ class AccountOverviewDetailsSpec extends AnyWordSpec with Matchers {
                 "Invalid header CorrelationId."
               )
             val result: Future[Result] =
-              controller.individualAccountOverview(inValidUtr, inValidTaxYear(0))(
+              controller.individualAccountOverview(inValidUtr(0), inValidTaxYear(0))(
                 fakeRequest("live", "correlationId")
               )
             status(result) shouldBe Status.BAD_REQUEST
