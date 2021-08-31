@@ -95,7 +95,7 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
     }
 
     val taxYearValidation: ValidatedNel[ErrorResult, String] = {
-      if (taxYear.matches(yearRegex)) Valid(taxYear)
+      if (taxYear.matches(yearRegex)) Valid((taxYear.toInt - 1).toString)
       else
         Validated.invalidNel(
           ErrorResult(InvalidTaxYear, s"$message Invalid parameter taxYear.")

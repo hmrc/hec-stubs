@@ -37,7 +37,7 @@ object TestData {
   val expectedAccountOverviewJson: JsValue = Json.parse("""
                                             |{
                                             |    "utr": "1234567890",
-                                            |    "taxYear": "2021",
+                                            |    "taxYear": "2020",
                                             |    "returnStatus": "Return Found"
                                             |}
                                             |""".stripMargin)
