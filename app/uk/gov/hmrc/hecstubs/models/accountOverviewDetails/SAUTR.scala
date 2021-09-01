@@ -14,23 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.hecstubs.controllers
+package uk.gov.hmrc.hecstubs.models.accountOverviewDetails
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
-import play.api.http.Status
-import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Helpers}
+import play.api.libs.json.{JsString, Writes}
 
-class MicroserviceHelloWorldControllerSpec extends AnyWordSpec with Matchers {
+final case class SAUTR(value: String) extends AnyVal
 
-  private val fakeRequest = FakeRequest("GET", "/")
-  private val controller  = new MicroserviceHelloWorldController(Helpers.stubControllerComponents())
+object SAUTR {
 
-  "GET /" should {
-    "return 200" in {
-      val result = controller.hello()(fakeRequest)
-      status(result) shouldBe Status.OK
-    }
+  implicit val writes: Writes[SAUTR] = Writes { sautr =>
+    JsString(sautr.value)
   }
+
 }
