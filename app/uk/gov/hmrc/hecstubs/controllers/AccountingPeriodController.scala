@@ -35,9 +35,9 @@ import java.util.UUID
 @Singleton
 class AccountingPeriodController @Inject() (cc: ControllerComponents) extends BackendController(cc) with Logging {
 
-  val message    = "Submission has not passed validation."
-  val ctutrRegex = "^[0-9]{10}$"
-  val dateRegex  =
+  val badRequestMessage = "Submission has not passed validation."
+  val ctutrRegex        = "^[0-9]{10}$"
+  val dateRegex         =
     "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
 
   def accountingPeriod(ctutr: String, startDate: String, endDate: String): Action[AnyContent] = Action { request =>
@@ -82,21 +82,21 @@ class AccountingPeriodController @Inject() (cc: ControllerComponents) extends Ba
       if (ctutr.matches(ctutrRegex)) Valid(CTUTR(ctutr))
       else
         Validated.invalidNel(
-          ErrorResult(InvalidCTUTR, s"$message Invalid parameter ctutr.")
+          ErrorResult(InvalidCTUTR, s"$badRequestMessage Invalid parameter ctutr.")
         )
 
     val startDateValidation: ValidatedNel[ErrorResult, LocalDate] =
       if (startDate.matches(dateRegex)) Valid(LocalDate.parse(startDate))
       else
         Validated.invalidNel(
-          ErrorResult(InvalidStartDate, s"$message Invalid query parameter startDate.")
+          ErrorResult(InvalidStartDate, s"$badRequestMessage Invalid query parameter startDate.")
         )
 
     val endDateValidation: ValidatedNel[ErrorResult, LocalDate] =
       if (endDate.matches(dateRegex)) Valid(LocalDate.parse(endDate))
       else
         Validated.invalidNel(
-          ErrorResult(InvalidEndDate, s"$message Invalid query parameter endDate.")
+          ErrorResult(InvalidEndDate, s"$badRequestMessage Invalid query parameter endDate.")
         )
 
     val correlationIdValidation: ValidatedNel[ErrorResult, String] =
