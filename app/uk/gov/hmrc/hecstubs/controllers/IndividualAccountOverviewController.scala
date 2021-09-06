@@ -43,7 +43,7 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
   /**
     * fetch the individual account overview based on utr and tx year
     * @param utr
-    * @param taxYear
+    * @param taxYear year the tax year ends
     * @return
     */
   def individualAccountOverview(utr: String, taxYear: String): Action[AnyContent] = Action { request =>
@@ -95,7 +95,7 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
     }
 
     val taxYearValidation: ValidatedNel[ErrorResult, String] = {
-      if (taxYear.matches(yearRegex)) Valid((taxYear.toInt - 1).toString)
+      if (taxYear.matches(yearRegex)) Valid((taxYear.toInt).toString)
       else
         Validated.invalidNel(
           ErrorResult(InvalidTaxYear, s"$badRequestMessage Invalid parameter taxYear.")
