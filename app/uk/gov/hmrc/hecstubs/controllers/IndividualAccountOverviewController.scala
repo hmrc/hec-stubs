@@ -41,10 +41,14 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
   val yearRegex         = "^[0-9]{4}$"
 
   /**
-    * fetch the individual account overview based on utr and tx year
-    * @param utr
-    * @param taxYear year the tax year ends
-    * @return
+    * Fetch the individual account overview based on utr and tax year.
+    * The default status returned is ReturnFound.
+    * Provide SAUTR starting with
+    *  - "1111" to receive a status of NoReturnFound
+    *  - "2222" to receive a status of NoticeToFileIssued
+    * @param utr The individual's UTR
+    * @param taxYear Year the tax year ends
+    * @return Status for the given tax year
     */
   def individualAccountOverview(utr: String, taxYear: String): Action[AnyContent] = Action { request =>
     val correlationId = request.headers.get("CorrelationId").getOrElse(UUID.randomUUID().toString)
@@ -75,12 +79,11 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
 
   }
 
+  private val noReturnUtrPrefix           = "1111"
+  private val noticeToFileIssuedUtrPrefix = "2222"
+
   /**
-    * validating the utr, year and correleation id
-    * @param utr
-    * @param taxYear
-    * @param correlationId
-    * @return
+    * validating the utr, year and correlation id
     */
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
   private def validateIndividualDetails(
@@ -109,11 +112,18 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
         Validated.invalidNel(
           ErrorResult(InvalidCorrelationId, s"$badRequestMessage Invalid header CorrelationId.")
         )
+    }
 
+    val status = if (utr.startsWith(noReturnUtrPrefix)) {
+      NoReturnFound
+    } else if (utr.startsWith(noticeToFileIssuedUtrPrefix)) {
+      NoticeToFileIssued
+    } else {
+      ReturnFound
     }
 
     (utrValidation, taxYearValidation, correlationIdValidation)
-      .mapN((utr, taxYear, _) => IndividualAccountOverview(utr, taxYear, ReturnFound))
+      .mapN((utr, taxYear, _) => IndividualAccountOverview(utr, taxYear, status))
   }
 
 }

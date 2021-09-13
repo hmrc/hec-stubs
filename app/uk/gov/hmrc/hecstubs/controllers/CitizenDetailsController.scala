@@ -26,12 +26,19 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 @Singleton
 class CitizenDetailsController @Inject() (cc: ControllerComponents) extends BackendController(cc) with Logging {
 
+  /**
+    * Stub for fetching individual details from the Citizens Details Service.
+    * If NINO starts with "NS" then no UTR is returned, else a default UTR is returned.
+    * @param ninoNoSuffix The NINO suffix for the individual
+    * @return The user's details
+    */
   def citizenDetails(ninoNoSuffix: String): Action[AnyContent] = Action { _ =>
+    val maybeUtr     = if (ninoNoSuffix.startsWith("NS")) None else Some("1234567895")
     val responseJson =
       Json.toJson(
         CidPerson(
           Some(CidNames(Some(CidName(Some("Karen"), Some("McKarenFace"))))),
-          TaxIds(Some("1234567895")),
+          TaxIds(maybeUtr),
           Some("01121922")
         )
       )

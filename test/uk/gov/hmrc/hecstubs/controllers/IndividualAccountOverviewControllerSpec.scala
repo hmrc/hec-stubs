@@ -20,13 +20,15 @@ import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.hecstubs.controllers.TestData._
-
 import java.util.UUID
+
+import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ReturnStatus.{NoReturnFound, NoticeToFileIssued, ReturnFound}
+
 import scala.concurrent.Future
 
 class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers {
@@ -42,7 +44,7 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
   private val controller = new IndividualAccountOverviewController(mockCC)
 
   val validUtr   = "1234567890"
-  val inValidUtr = List("12345678901", "ABC1234567", "AB675^^&hg")
+  val inValidUtr = List("12345678901", "ABC1234567", "AB675^^&hg", "111156", "222234")
 
   val validTaxYear   = "2021"
   val inValidTaxYear = List("202", "20188", "12", "0", "")
@@ -51,12 +53,57 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
 
     "fetching account overview details " should {
 
-      "return 200 and return the correct response" in {
+      "return 200 with correct status" when {
+        "utr starts with 1111" in {
+          val utr                    = "1111567890"
+          val expectedJson: JsValue  = Json.parse(s"""
+               |{
+               |    "utr": "$utr",
+               |    "taxYear": "2021",
+               |    "returnStatus": "${NoReturnFound.value}"
+               |}
+               |""".stripMargin)
+          val result: Future[Result] =
+            controller.individualAccountOverview(utr, validTaxYear)(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.OK
+          contentAsJson(result) mustBe expectedJson
+        }
 
-        val result: Future[Result] =
-          controller.individualAccountOverview(validUtr, validTaxYear)(fakeRequest("live", UUID.randomUUID().toString))
-        status(result) shouldBe Status.OK
-        contentAsJson(result) mustBe expectedAccountOverviewJson
+        "utr starts with 2222" in {
+          val utr                    = "2222567890"
+          val expectedJson: JsValue  = Json.parse(s"""
+               |{
+                   "utr": "$utr",
+               |    "taxYear": "2021",
+               |    "returnStatus": "${NoticeToFileIssued.value}"
+               |}
+               |""".stripMargin)
+          val result: Future[Result] =
+            controller.individualAccountOverview(utr, validTaxYear)(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.OK
+          contentAsJson(result) mustBe expectedJson
+        }
+
+        "utr starts with any other string" in {
+          val utr                    = "1234567890"
+          val expectedJson: JsValue  = Json.parse(s"""
+               |{
+                   "utr": "$utr",
+               |    "taxYear": "2021",
+               |    "returnStatus": "${ReturnFound.value}"
+               |}
+               |""".stripMargin)
+          val result: Future[Result] =
+            controller.individualAccountOverview(utr, validTaxYear)(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.OK
+          contentAsJson(result) mustBe expectedJson
+        }
       }
 
       "return bad request" when {
