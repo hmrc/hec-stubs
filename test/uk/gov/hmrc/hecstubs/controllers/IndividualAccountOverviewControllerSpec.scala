@@ -44,7 +44,7 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
   private val controller = new IndividualAccountOverviewController(mockCC)
 
   val validUtr   = "1234567890"
-  val inValidUtr = List("12345678901", "ABC1234567", "AB675^^&hg")
+  val inValidUtr = List("12345678901", "ABC1234567", "AB675^^&hg", "111156", "222234")
 
   val validTaxYear   = "2021"
   val inValidTaxYear = List("202", "20188", "12", "0", "")

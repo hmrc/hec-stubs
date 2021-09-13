@@ -43,7 +43,7 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
   /**
     * Fetch the individual account overview based on utr and tax year.
     * The default status returned is ReturnFound.
-    * Provide UTR starting with
+    * Provide SAUTR starting with
     *  - "1111" to receive a status of NoReturnFound
     *  - "2222" to receive a status of NoticeToFileIssued
     * @param utr The individual's UTR

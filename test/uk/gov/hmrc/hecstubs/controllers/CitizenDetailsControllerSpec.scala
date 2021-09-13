@@ -24,7 +24,6 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-//import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ReturnStatus.NoReturnFound
 
 import scala.concurrent.Future
 
@@ -40,8 +39,8 @@ class CitizenDetailsControllerSpec extends AnyWordSpec with Matchers {
 
     "fetching citizen details " should {
 
-      "not return the UTR if NINO starts with NOUTR" in {
-        val nino                   = "NOUTR67890"
+      "not return the UTR if NINO starts with NS" in {
+        val nino                   = "NS123456"
         val expectedJson: JsValue  = Json.parse(s"""
              |{
              |    "name": {
@@ -60,7 +59,7 @@ class CitizenDetailsControllerSpec extends AnyWordSpec with Matchers {
         contentAsJson(result) mustBe expectedJson
       }
 
-      "return the UTR if NINO does not start with NOUTR" in {
+      "return the UTR if NINO does not start with NS" in {
         val nino                   = "1234567890"
         val expectedJson: JsValue  = Json.parse(s"""
                                                    |{
