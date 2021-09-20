@@ -40,16 +40,10 @@ class DESController @Inject() (cc: ControllerComponents) extends BackendControll
   def getCtutr(crn: String): Action[AnyContent] = Action { _ =>
     val response = CompanyProfile.getProfile(crn).flatMap(_.desResponse)
     response match {
-      case Some(desResponse) =>
-        (desResponse.status, desResponse.responseBody) match {
-          case (OK, responseBody)     =>
-            logger.info(s"Responding with success for get CTUTR from DES using CRN $crn with json - $responseBody")
-            Ok(responseBody)
-          case (status, responseBody) =>
-            logger.info(s"Returning status $status for get CTUTR from DES response $crn with json - $responseBody}")
-            Status(status)(responseBody)
-        }
-      case None              =>
+      case Some(GetCTUTRDESResponse(status, responseBody)) =>
+        logger.info(s"Returning status $status for get CTUTR from DES response $crn with json - $responseBody}")
+        Status(status)(responseBody)
+      case None                                            =>
         logger.info(s"No profile matched, returning success with JSON ${GetCTUTRDESResponse.ctutrRes}")
         Ok(GetCTUTRDESResponse.happyDesResponse)
     }
