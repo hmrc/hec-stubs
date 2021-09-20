@@ -33,18 +33,16 @@ class CompanyDetailsController @Inject() (cc: ControllerComponents) extends Back
     response match {
       case Some(companyRes) =>
         (companyRes.status, companyRes.responseBody) match {
-          case (OK, Some(jsValue))      =>
+          case (OK, Some(jsValue)) =>
             logger.info(
               s"Responding to company house proxy call for company Number : $companyNumber with Json:  ${jsValue.toString()}"
             )
             Ok(jsValue)
-          case (BAD_REQUEST, _)         => BadRequest
-          case (SERVICE_UNAVAILABLE, _) => ServiceUnavailable
-          case (NOT_FOUND, _)           =>
+          case (status, _)         =>
             logger.info(
-              s"Company name not found in the List  for company number $companyNumber}"
+              s"Returning status for company house API response  $companyNumber}"
             )
-            NotFound
+            Status(status)
 
           case _ => InternalServerError
         }

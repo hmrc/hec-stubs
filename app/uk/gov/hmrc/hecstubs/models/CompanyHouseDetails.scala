@@ -20,10 +20,10 @@ import play.api.libs.json.JsonConfiguration.Aux
 import play.api.libs.json.JsonNaming.SnakeCase
 import play.api.libs.json.{Json, JsonConfiguration, OWrites}
 
-final case class CompanyDetails(companyName: String)
+final case class CompanyHouseDetails(companyName: String)
 
-object CompanyDetails {
+object CompanyHouseDetails {
 
-  implicit val config: Aux[Json.MacroOptions]      = JsonConfiguration(SnakeCase)
-  implicit val userFormat: OWrites[CompanyDetails] = Json.writes[CompanyDetails]
+  implicit val config: Aux[Json.MacroOptions]           = JsonConfiguration(SnakeCase)
+  implicit val userFormat: OWrites[CompanyHouseDetails] = Json.writes[CompanyHouseDetails]
 }

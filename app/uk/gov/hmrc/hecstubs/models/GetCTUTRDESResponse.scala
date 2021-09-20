@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.hecstubs.models
 
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 
-final case class DESResponse(status: Int, responseBody: JsValue)
+final case class GetCTUTRDESResponse(status: Int, responseBody: JsValue)
 
-object DESResponse {
+object GetCTUTRDESResponse {
+
   val ctutrRes: String =
     s"""
        |{
@@ -61,5 +62,12 @@ object DESResponse {
        |   "reason": "Depending systems are currently not working"
        |}
        |""".stripMargin
+
+  val happyDesResponsse: JsValue         = Json.parse(ctutrRes)
+  val happyDesResponse: JsValue          = Json.parse(ctutrRes)
+  val badRequestDesResponse: JsValue     = Json.parse(error400Response)
+  val notFoundDeResponse: JsValue        = Json.parse(error404Response)
+  val serverErrorDesResponse: JsValue    = Json.parse(error500Response)
+  val serviceUnavailDesResponse: JsValue = Json.parse(error503Response)
 
 }
