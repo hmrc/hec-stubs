@@ -56,8 +56,6 @@ class CompanyDetailsController @Inject() (cc: ControllerComponents) extends Back
               s"Returning status for company house API response  $companyNumber}"
             )
             Status(status)
-
-          case _ => InternalServerError
         }
       case None             =>
         logger.info(
