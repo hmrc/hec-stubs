@@ -42,6 +42,7 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
 
   /**
     * Fetch the individual account overview based on utr and tax year.
+    * To receive an 500 (Internal Server Error), pass a UTR starting with "3333"
     * The default status returned is ReturnFound.
     * Provide SAUTR starting with
     *  - "1111" to receive a status of NoReturnFound
@@ -55,20 +56,23 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
     val environment   = request.headers.get("Environment").flatMap(Environment.getEnvironmentFromString)
     environment match {
       case Some(_) =>
-        validateIndividualDetails(utr, taxYear, correlationId) match {
-          case Invalid(errorList) =>
-            val errorResponse = ErrorResponse(errorList.toList)
-            logger.info(
-              s"Responding to call for Self-Assessment Individual failed with error Response : ${errorResponse.toString()}"
-            )
-            BadRequest(Json.toJson(errorResponse))
-          case Valid(data)        =>
-            val responseJson = Json.toJson(data)
-            logger.info(
-              s"Responding to call for Self-Assessment Individual Account Overview for UTR $utr and  taxYear: $taxYear with JSON: ${responseJson.toString()}"
-            )
-            Ok(responseJson)
-
+        if (utr.startsWith("3333")) {
+          InternalServerError
+        } else {
+          validateIndividualDetails(utr, taxYear, correlationId) match {
+            case Invalid(errorList) =>
+              val errorResponse = ErrorResponse(errorList.toList)
+              logger.info(
+                s"Responding to call for Self-Assessment Individual failed with error Response : ${errorResponse.toString()}"
+              )
+              BadRequest(Json.toJson(errorResponse))
+            case Valid(data)        =>
+              val responseJson = Json.toJson(data)
+              logger.info(
+                s"Responding to call for Self-Assessment Individual Account Overview for UTR $utr and  taxYear: $taxYear with JSON: ${responseJson.toString()}"
+              )
+              Ok(responseJson)
+          }
         }
       case None    =>
         logger.info(
