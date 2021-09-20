@@ -106,6 +106,17 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
         }
       }
 
+      "return internal server error" when {
+        "SAUTR starts with 3333" in {
+          val utr                    = "3333333333"
+          val result: Future[Result] =
+            controller.individualAccountOverview(utr, validTaxYear)(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        }
+      }
+
       "return bad request" when {
 
         "One invalid parameter" when {
