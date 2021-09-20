@@ -20,6 +20,7 @@ import com.google.inject.Singleton
 import javax.inject.Inject
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.hecstubs.models.GetCTUTRDESResponse
+import uk.gov.hmrc.hecstubs.models.GetCTUTRDESResponse.happyDesResponse
 import uk.gov.hmrc.hecstubs.util.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -38,14 +39,11 @@ class DESController @Inject() (cc: ControllerComponents) extends BackendControll
     * @return HttpResponse
     */
   def getCtutr(crn: String): Action[AnyContent] = Action { _ =>
-    val response = CompanyProfile.getProfile(crn).flatMap(_.desResponse)
-    response match {
-      case Some(GetCTUTRDESResponse(status, responseBody)) =>
-        logger.info(s"Returning status $status for get CTUTR from DES response $crn with json - $responseBody}")
-        Status(status)(responseBody)
-      case None                                            =>
-        logger.info(s"No profile matched, returning success with JSON ${GetCTUTRDESResponse.ctutrRes}")
-        Ok(GetCTUTRDESResponse.happyDesResponse)
-    }
+    val GetCTUTRDESResponse(status, responseBody) = CompanyProfile
+      .getProfile(crn)
+      .flatMap(_.desResponse)
+      .getOrElse(GetCTUTRDESResponse(OK, happyDesResponse))
+    logger.info(s"Responding to get CTUTR from DES for CRN $crn with status $status & body - $responseBody}")
+    Status(status)(responseBody)
   }
 }
