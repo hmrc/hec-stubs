@@ -61,7 +61,6 @@ object GetCTUTRDESResponse {
        |}
        |""".stripMargin
 
-  val happyDesResponsse: JsValue         = Json.parse(ctutrRes)
   val happyDesResponse: JsValue          = Json.parse(ctutrRes)
   val badRequestDesResponse: JsValue     = Json.parse(error400Response)
   val notFoundDeResponse: JsValue        = Json.parse(error404Response)

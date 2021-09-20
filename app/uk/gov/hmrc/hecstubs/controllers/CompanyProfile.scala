@@ -32,7 +32,7 @@ object CompanyProfile {
   val profile1: CompanyProfile = CompanyProfile(
     _.startsWith("1"),
     CompanyHouseResponse(OK, Some(houseResponse)),
-    Some(GetCTUTRDESResponse(OK, happyDesResponsse))
+    Some(GetCTUTRDESResponse(OK, happyDesResponse))
   )
   val profile2: CompanyProfile = CompanyProfile(
     _.startsWith("21"),

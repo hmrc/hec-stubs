@@ -3,3 +3,4 @@ GET       /citizen-details/nino-no-suffix/:ninoNoSuffix                         
 GET       /individuals/self-assessment/account-overview/:utr/:taxYear           uk.gov.hmrc.hecstubs.controllers.IndividualAccountOverviewController.individualAccountOverview(utr, taxYear)
 GET       /organisations/corporation-tax/:ctutr/company/accounting-periods      uk.gov.hmrc.hecstubs.controllers.AccountingPeriodController.accountingPeriod(ctutr, startDate, endDate)
 GET       /company/:companynumber                                               uk.gov.hmrc.hecstubs.controllers.CompanyDetailsController.findCompanyName(companynumber)
+GET       /corporation-tax/identifiers/crn/:crn                                 uk.gov.hmrc.hecstubs.controllers.DESController.getCtutr(crn)
