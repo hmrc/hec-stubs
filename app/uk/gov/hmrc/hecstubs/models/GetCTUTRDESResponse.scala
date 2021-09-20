@@ -25,9 +25,7 @@ object GetCTUTRDESResponse {
   val ctutrRes: String =
     s"""
        |{
-       |  "CTUTR": {
-       |    "value": "1234567890"
-       |  }
+       |  "CTUTR":  "1234567890"
        |}
        |""".stripMargin
 
