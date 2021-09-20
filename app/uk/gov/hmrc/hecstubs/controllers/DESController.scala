@@ -35,6 +35,7 @@ class DESController @Inject() (cc: ControllerComponents) extends BackendControll
     *    - with 22 -> returns 400 bad request response
     *    - with 23 -> returns 500 internal server error response
     *    - with 24 -> returns 503 service unavailable response
+    * If none of the above conditions are satisfied, the result is a 200 success
     * @param crn The company number
     * @return HttpResponse
     */
