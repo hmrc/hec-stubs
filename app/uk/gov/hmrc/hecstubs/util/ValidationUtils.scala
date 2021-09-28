@@ -25,6 +25,7 @@ import java.util.UUID
 import scala.util.{Failure, Success, Try}
 
 object ValidationUtils {
+
   def correlationIdValidation(correlationId: String): ValidatedNel[ErrorResult, String] = Try(
     UUID.fromString(correlationId)
   ) match {

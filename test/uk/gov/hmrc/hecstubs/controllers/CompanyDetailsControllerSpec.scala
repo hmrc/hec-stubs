@@ -39,46 +39,93 @@ class CompanyDetailsControllerSpec extends AnyWordSpec with Matchers {
 
     "fetching company details " should {
 
-      "return the company name if company number starts with 1" in {
-        val companyNumber         = "1234567"
-        val expectedJson: JsValue = Json.parse(s"""
-                                                   |{"company_name" : "Test Tech Ltd"}
-                                                   |""".stripMargin)
+      "return the company name" when {
 
-        val result: Future[Result] =
-          controller.findCompanyName(companyNumber)(fakeRequest)
-        status(result) shouldBe Status.OK
-        contentAsJson(result) mustBe expectedJson
+        def test(companyNumber: String) = {
+          val expectedJson: JsValue = Json.parse(s"""
+               |{"company_name" : "Test Tech Ltd"}
+               |""".stripMargin)
+
+          val result: Future[Result] =
+            controller.findCompanyName(companyNumber)(fakeRequest)
+          status(result) shouldBe Status.OK
+          contentAsJson(result) mustBe expectedJson
+        }
+
+        "the company number starts with 11" in {
+          test("1134567")
+        }
+
+        "the company number starts with 12" in {
+          test("1234567")
+        }
+
+        "the company number starts with 13" in {
+          test("1324567")
+        }
+
+        "the company number starts with 14" in {
+          test("1434567")
+        }
+
+        "return the company name if company number starts with 21" in {
+          test("21234567")
+        }
+
+        "return the company name if company number starts with 22" in {
+          test("22234567")
+        }
+
+        "return the company name if company number starts with 23" in {
+          test("23234567")
+        }
+
+        "return the company name if company number starts with 24" in {
+          test("24234567")
+        }
+
+        "return the company name if company number starts with 41" in {
+          test("41234567")
+        }
+
+        "return the company name if company number starts with 42" in {
+          test("42234567")
+        }
+
+        "return the company name if company number starts with 43" in {
+          test("43234567")
+        }
+
+        "return the company name if company number starts with 44" in {
+          test("44234567")
+        }
+
+        "return the company name if company number starts with 46" in {
+          test("46234567")
+        }
+
+        "return the company name if company number starts with 47" in {
+          test("47234567")
+        }
+
       }
 
-      "return the company name if company number starts with 2" in {
-        val companyNumber         = "21234567"
-        val expectedJson: JsValue = Json.parse(s"""
-                                                  |{"company_name" : "Test Tech Ltd"}
-                                                  |""".stripMargin)
-
-        val result: Future[Result] =
-          controller.findCompanyName(companyNumber)(fakeRequest)
-        status(result) shouldBe Status.OK
-        contentAsJson(result) mustBe expectedJson
-      }
-
-      "not return company name if company number starts with 3" in {
+      "not return company name if company number starts with 31" in {
         val companyNumber          = "31234567"
         val result: Future[Result] =
           controller.findCompanyName(companyNumber)(fakeRequest)
         status(result) shouldBe Status.NOT_FOUND
       }
 
-      "return internal sever error if company number starts with 4" in {
-        val companyNumber          = "41234567"
+      "return internal sever error if company number starts with 32" in {
+        val companyNumber          = "32234567"
         val result: Future[Result] =
           controller.findCompanyName(companyNumber)(fakeRequest)
         status(result) shouldBe Status.INTERNAL_SERVER_ERROR
       }
 
-      "return service unavailable if company number starts with 5" in {
-        val companyNumber          = "51234567"
+      "return service unavailable if company number starts with 33" in {
+        val companyNumber          = "33234567"
         val result: Future[Result] =
           controller.findCompanyName(companyNumber)(fakeRequest)
         status(result) shouldBe Status.SERVICE_UNAVAILABLE

@@ -17,11 +17,10 @@
 package uk.gov.hmrc.hecstubs.models.companyAccountingPeriod
 
 import play.api.libs.json.{Json, OWrites}
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ReturnStatus
 
 final case class CompanyAccountingPeriod(
   ctutr: CTUTR,
-  returnStatus: ReturnStatus,
+  returnStatus: ReturnLookupStatus,
   accountingPeriods: List[AccountingPeriod]
 )
 

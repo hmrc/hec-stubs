@@ -16,31 +16,9 @@
 
 package uk.gov.hmrc.hecstubs.controllers
 
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.Json
 
 object TestData {
-
-  val expectedAccountingPeriodJson: JsValue = Json.parse("""
-                                            |{
-                                            |  "ctutr": "1234567890",
-                                            |  "returnStatus": "Return Found",
-                                            |  "accountingPeriods": [
-                                            |    {
-                                            |      "accountingPeriod": "01",
-                                            |      "accountingPeriodStartDate": "2020-04-05",
-                                            |      "accountingPeriodEndDate": "2021-04-05"
-                                            |    }
-                                            |  ]
-                                            |}
-                                            |""".stripMargin)
-
-  val expectedAccountOverviewJson: JsValue = Json.parse("""
-                                            |{
-                                            |    "utr": "1234567890",
-                                            |    "taxYear": "2021",
-                                            |    "returnStatus": "Return Found"
-                                            |}
-                                            |""".stripMargin)
 
   def badJsonResponse(codeWithMessages: (String, String)*) = {
     val errorObjects = codeWithMessages.toList

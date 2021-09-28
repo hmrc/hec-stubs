@@ -20,12 +20,15 @@ import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.hecstubs.controllers.TestData._
+import uk.gov.hmrc.hecstubs.models.CompanyAccountingPeriodResponse
+import uk.gov.hmrc.hecstubs.models.companyAccountingPeriod.{CTUTR, CompanyAccountingPeriodRequestParameters}
 
+import java.time.LocalDate
 import java.util.UUID
 import scala.concurrent.Future
 
@@ -44,11 +47,14 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
 
   private val controller = new AccountingPeriodController(mockCC)
 
-  val validCtutr   = "1234567890"
+  val validCtutr   = "1234567895"
   val inValidCtUtr = List("12345678901", "ABC1234567", "AB675^^&hg")
 
-  val validStartDate = "2020-04-05"
-  val validEndDate   = "2021-04-05"
+  val validStartDateString = "2020-04-05"
+  val validEndDateString   = "2021-04-05"
+
+  val validStartDate = LocalDate.parse(validStartDateString)
+  val validEndDate   = LocalDate.parse(validEndDateString)
 
   val inValidStartDate = List(
     "2020-04-35",
@@ -80,257 +86,320 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
   )
 
   "AccountingPeriodController" when {
-    "fetch accounting period details " should {
 
-      "return 200 and the correct response when all valid values are passed" in {
+    "fetch accounting period details " when {
 
-        val result: Future[Result] = controller.accountingPeriod(validCtutr, "2020-04-05", "2021-04-05")(
+      "passed all valid values" should {
+
+        def testIsOkWithJson(
+          ctutr: CTUTR,
+          expectedResponseJson: CompanyAccountingPeriodRequestParameters => JsValue
+        ) = {
+          val requestParams = CompanyAccountingPeriodRequestParameters(
+            ctutr,
+            validStartDate,
+            validEndDate
+          )
+
+          val result: Future[Result] =
+            controller.accountingPeriod(requestParams.ctutr.value, validStartDateString, validEndDateString)(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.OK
+          contentAsJson(result) mustBe expectedResponseJson(requestParams)
+        }
+
+        "return a 'return found' response" when {
+
+          "the CTUTR is 1111111111" in {
+            testIsOkWithJson(CTUTR("1111111111"), CompanyAccountingPeriodResponse.returnFoundResponse)
+          }
+
+          "the CTUTR is not configured to return other responses" in {
+            testIsOkWithJson(CTUTR(validCtutr), CompanyAccountingPeriodResponse.returnFoundResponse)
+          }
+
+        }
+
+        "return a 'notice to file issued' response when the CTUTR is 2222222222" in {
+          testIsOkWithJson(CTUTR("2222222222"), CompanyAccountingPeriodResponse.noticeToFileIssuedResponse)
+        }
+
+        "return a 'no return found' response when the CTUTR is 3333333333" in {
+          testIsOkWithJson(CTUTR("3333333333"), CompanyAccountingPeriodResponse.noReturnFoundResponse)
+        }
+
+        "return a 'no accounting periods' response when the CTUTR is 4444444444" in {
+          testIsOkWithJson(CTUTR("4444444444"), CompanyAccountingPeriodResponse.noAccountingPeriodsResponse)
+        }
+
+      }
+
+    }
+
+    "return bad request " when {
+
+      "One invalid parameter" when {
+
+        "ctutr is invalid" in {
+
+          val expectedJson: JsValue = badJsonResponse(("INVALID_CTUTR", "Invalid parameter ctutr."))
+
+          inValidCtUtr.map { invUtr =>
+            val result = controller.accountingPeriod(invUtr, validStartDateString, validEndDateString)(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+            status(result) shouldBe Status.BAD_REQUEST
+            contentAsJson(result) mustBe expectedJson
+          }
+        }
+
+        "start Date in query param is Invalid" in {
+
+          val expectedJson: JsValue = badJsonResponse(("INVALID_START_DATE", "Invalid query parameter startDate."))
+
+          inValidStartDate.map { inStartDate =>
+            val result = controller.accountingPeriod(validCtutr, inStartDate, validEndDateString)(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+            status(result) shouldBe Status.BAD_REQUEST
+            contentAsJson(result) mustBe expectedJson
+          }
+
+        }
+
+        "End  Date in query param is Invalid" in {
+
+          val expectedJson: JsValue = badJsonResponse(("INVALID_END_DATE", "Invalid query parameter endDate."))
+
+          inValidEndDate.map { inEndDate =>
+            val result = controller.accountingPeriod(validCtutr, validStartDateString, inEndDate)(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+            status(result) shouldBe Status.BAD_REQUEST
+            contentAsJson(result) mustBe expectedJson
+          }
+
+        }
+
+        "Wrong Environment value is  passed in the header" in {
+          val result: Future[Result] =
+            controller.accountingPeriod(validCtutr, validStartDateString, validEndDateString)(
+              fakeRequest("env", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+
+        }
+
+        "No Environment value is  passed in the header" in {
+          val result: Future[Result] =
+            controller.accountingPeriod(validCtutr, validStartDateString, validEndDateString)(
+              fakeRequest("", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+        }
+
+        "Environment header is missing" in {
+          val result: Future[Result] =
+            controller.accountingPeriod(validCtutr, validStartDateString, validEndDateString)(
+              fakeRequestWithoutEnv()
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+
+        }
+
+        "Invalid CorrelationId is  passed in the header" in {
+          val expectedJson           = badJsonResponse(("INVALID_CORRELATIONID", "Invalid header CorrelationId."))
+          val result: Future[Result] =
+            controller.accountingPeriod(validCtutr, validStartDateString, validEndDateString)(
+              fakeRequest("live", "correlationid")
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+          contentAsJson(result) mustBe expectedJson
+
+        }
+      }
+
+      "two invalid parameters" when {
+
+        "ctutr and startDate are invalid" in {
+
+          val expectedJson: JsValue =
+            badJsonResponse(
+              ("INVALID_CTUTR", "Invalid parameter ctutr."),
+              ("INVALID_START_DATE", "Invalid query parameter startDate.")
+            )
+
+          val result: Future[Result] =
+            controller.accountingPeriod(inValidCtUtr(0), inValidStartDate(0), validEndDateString)(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+          contentAsJson(result) mustBe expectedJson
+        }
+
+        "ctutr and endDate are invalid" in {
+
+          val expectedJson: JsValue = badJsonResponse(
+            ("INVALID_CTUTR", "Invalid parameter ctutr."),
+            ("INVALID_END_DATE", "Invalid query parameter endDate.")
+          )
+
+          val result: Future[Result] =
+            controller.accountingPeriod(inValidCtUtr(0), validStartDateString, inValidEndDate(0))(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+          contentAsJson(result) mustBe expectedJson
+        }
+
+        "startDate and endDate are invalid" in {
+
+          val expectedJson: JsValue = badJsonResponse(
+            ("INVALID_START_DATE", "Invalid query parameter startDate."),
+            ("INVALID_END_DATE", "Invalid query parameter endDate.")
+          )
+
+          val result: Future[Result] =
+            controller.accountingPeriod(validCtutr, inValidStartDate(0), inValidEndDate(0))(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+          contentAsJson(result) mustBe expectedJson
+        }
+
+        "ctutr and CorrelationId  are invalid" in {
+
+          val expectedJson: JsValue = badJsonResponse(
+            ("INVALID_CTUTR", "Invalid parameter ctutr."),
+            ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
+          )
+
+          val result: Future[Result] =
+            controller.accountingPeriod(inValidCtUtr(0), validStartDateString, validEndDateString)(
+              fakeRequest("live", "correlationid")
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+          contentAsJson(result) mustBe expectedJson
+        }
+
+        "start date and CorrelationId  are invalid" in {
+
+          val expectedJson: JsValue = badJsonResponse(
+            ("INVALID_START_DATE", "Invalid query parameter startDate."),
+            ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
+          )
+
+          val result: Future[Result] =
+            controller.accountingPeriod(validCtutr, inValidStartDate(0), validEndDateString)(
+              fakeRequest("live", "correlationid")
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+          contentAsJson(result) mustBe expectedJson
+        }
+
+        "end date and CorrelationId  are invalid" in {
+
+          val expectedJson: JsValue = badJsonResponse(
+            ("INVALID_END_DATE", "Invalid query parameter endDate."),
+            ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
+          )
+
+          val result: Future[Result] =
+            controller.accountingPeriod(validCtutr, validStartDateString, inValidEndDate(0))(
+              fakeRequest("live", "correlationid")
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+          contentAsJson(result) mustBe expectedJson
+        }
+
+      }
+
+      "three invalid parameters" when {
+
+        "ctutr, startDate and end date are invalid" in {
+
+          val expectedJson: JsValue = badJsonResponse(
+            ("INVALID_CTUTR", "Invalid parameter ctutr."),
+            ("INVALID_START_DATE", "Invalid query parameter startDate."),
+            ("INVALID_END_DATE", "Invalid query parameter endDate.")
+          )
+
+          val result: Future[Result] =
+            controller.accountingPeriod(inValidCtUtr(0), inValidStartDate(0), inValidEndDate(0))(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+          contentAsJson(result) mustBe expectedJson
+
+        }
+
+        "ctutr, startDate and correlationId are invalid" in {
+
+          val expectedJson: JsValue = badJsonResponse(
+            ("INVALID_CTUTR", "Invalid parameter ctutr."),
+            ("INVALID_START_DATE", "Invalid query parameter startDate."),
+            ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
+          )
+
+          val result: Future[Result] =
+            controller.accountingPeriod(inValidCtUtr(0), inValidStartDate(0), validEndDateString)(
+              fakeRequest("live", "correlationId")
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+          contentAsJson(result) mustBe expectedJson
+        }
+      }
+
+      "four invalid parameters" when {
+        "ctutr, startDate, endDate and corelationid are invalid" in {
+          val expectedJson: JsValue = badJsonResponse(
+            ("INVALID_CTUTR", "Invalid parameter ctutr."),
+            ("INVALID_START_DATE", "Invalid query parameter startDate."),
+            ("INVALID_END_DATE", "Invalid query parameter endDate."),
+            ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
+          )
+
+          val result: Future[Result] =
+            controller.accountingPeriod(inValidCtUtr(0), inValidStartDate(0), inValidEndDate(0))(
+              fakeRequest("live", "correlationId")
+            )
+          status(result) shouldBe Status.BAD_REQUEST
+          contentAsJson(result) mustBe expectedJson
+        }
+      }
+
+    }
+
+    "return unprocessable entity" when {
+
+      val expectedJson: JsValue = Json.parse(
+        """
+          |{
+          |  "failures" : [
+          |    {
+          |      "code" : "INVALID_DATE",
+          |      "reason" : "The remote endpoint has indicated that start date is equal to or greater than the end date."      
+          |    }  
+          |  ]
+          |}
+          |""".stripMargin
+      )
+
+      "all request parameters can be parsed but the end date is equal to the start date" in {
+        val result = controller.accountingPeriod(validCtutr, validStartDateString, validStartDateString)(
           fakeRequest("live", UUID.randomUUID().toString)
         )
-        status(result) shouldBe Status.OK
-        contentAsJson(result) mustBe expectedAccountingPeriodJson
+        status(result) shouldBe Status.UNPROCESSABLE_ENTITY
+        contentAsJson(result) mustBe expectedJson
       }
 
-      "return 200 and the correct response when all valid values are passed except correlation Id" in {
-        val result: Future[Result] = controller.accountingPeriod(validCtutr, "2020-04-05", "2021-04-05")(
-          fakeRequestWithoutCorrelationId("live")
+      "all request parameters can be parsed but the end date is before the start date" in {
+        val result = controller.accountingPeriod(validCtutr, validEndDateString, validStartDateString)(
+          fakeRequest("live", UUID.randomUUID().toString)
         )
-        status(result) shouldBe Status.OK
-        contentAsJson(result) mustBe expectedAccountingPeriodJson
-      }
-
-      "return bad request " when {
-
-        "One invalid parameter" when {
-
-          "ctutr is invalid" in {
-
-            val expectedJson: JsValue = badJsonResponse(("INVALID_CTUTR", "Invalid parameter ctutr."))
-
-            inValidCtUtr.map { invUtr =>
-              val result = controller.accountingPeriod(invUtr, validStartDate, validEndDate)(
-                fakeRequest("live", UUID.randomUUID().toString)
-              )
-              status(result) shouldBe Status.BAD_REQUEST
-              contentAsJson(result) mustBe expectedJson
-            }
-          }
-
-          "start Date in query param is Invalid" in {
-
-            val expectedJson: JsValue = badJsonResponse(("INVALID_START_DATE", "Invalid query parameter startDate."))
-
-            inValidStartDate.map { inStartDate =>
-              val result = controller.accountingPeriod(validCtutr, inStartDate, validEndDate)(
-                fakeRequest("live", UUID.randomUUID().toString)
-              )
-              status(result) shouldBe Status.BAD_REQUEST
-              contentAsJson(result) mustBe expectedJson
-            }
-
-          }
-
-          "End  Date in query param is Invalid" in {
-
-            val expectedJson: JsValue = badJsonResponse(("INVALID_END_DATE", "Invalid query parameter endDate."))
-
-            inValidEndDate.map { inEndDate =>
-              val result = controller.accountingPeriod(validCtutr, validStartDate, inEndDate)(
-                fakeRequest("live", UUID.randomUUID().toString)
-              )
-              status(result) shouldBe Status.BAD_REQUEST
-              contentAsJson(result) mustBe expectedJson
-            }
-
-          }
-
-          "Wrong Environment value is  passed in the header" in {
-            val result: Future[Result] =
-              controller.accountingPeriod(validCtutr, validStartDate, validEndDate)(
-                fakeRequest("env", UUID.randomUUID().toString)
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-
-          }
-
-          "No Environment value is  passed in the header" in {
-            val result: Future[Result] =
-              controller.accountingPeriod(validCtutr, validStartDate, validEndDate)(
-                fakeRequest("", UUID.randomUUID().toString)
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-          }
-
-          "Environment header is missing" in {
-            val result: Future[Result] =
-              controller.accountingPeriod(validCtutr, validStartDate, validEndDate)(
-                fakeRequestWithoutEnv()
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-
-          }
-
-          "Invalid CorrelationId is  passed in the header" in {
-            val expectedJson           = badJsonResponse(("INVALID_CORRELATIONID", "Invalid header CorrelationId."))
-            val result: Future[Result] =
-              controller.accountingPeriod(validCtutr, validStartDate, validEndDate)(
-                fakeRequest("live", "correlationid")
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) mustBe expectedJson
-
-          }
-        }
-
-        "two invalid parameters" when {
-
-          "ctutr and startDate are invalid" in {
-
-            val expectedJson: JsValue =
-              badJsonResponse(
-                ("INVALID_CTUTR", "Invalid parameter ctutr."),
-                ("INVALID_START_DATE", "Invalid query parameter startDate.")
-              )
-
-            val result: Future[Result] =
-              controller.accountingPeriod(inValidCtUtr(0), inValidStartDate(0), validEndDate)(
-                fakeRequest("live", UUID.randomUUID().toString)
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) mustBe expectedJson
-          }
-
-          "ctutr and endDate are invalid" in {
-
-            val expectedJson: JsValue = badJsonResponse(
-              ("INVALID_CTUTR", "Invalid parameter ctutr."),
-              ("INVALID_END_DATE", "Invalid query parameter endDate.")
-            )
-
-            val result: Future[Result] =
-              controller.accountingPeriod(inValidCtUtr(0), validStartDate, inValidEndDate(0))(
-                fakeRequest("live", UUID.randomUUID().toString)
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) mustBe expectedJson
-          }
-
-          "startDate and endDate are invalid" in {
-
-            val expectedJson: JsValue = badJsonResponse(
-              ("INVALID_START_DATE", "Invalid query parameter startDate."),
-              ("INVALID_END_DATE", "Invalid query parameter endDate.")
-            )
-
-            val result: Future[Result] =
-              controller.accountingPeriod(validCtutr, inValidStartDate(0), inValidEndDate(0))(
-                fakeRequest("live", UUID.randomUUID().toString)
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) mustBe expectedJson
-          }
-
-          "ctutr and CorrelationId  are invalid" in {
-
-            val expectedJson: JsValue = badJsonResponse(
-              ("INVALID_CTUTR", "Invalid parameter ctutr."),
-              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
-            )
-
-            val result: Future[Result] =
-              controller.accountingPeriod(inValidCtUtr(0), validStartDate, validEndDate)(
-                fakeRequest("live", "correlationid")
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) mustBe expectedJson
-          }
-
-          "start date and CorrelationId  are invalid" in {
-
-            val expectedJson: JsValue = badJsonResponse(
-              ("INVALID_START_DATE", "Invalid query parameter startDate."),
-              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
-            )
-
-            val result: Future[Result] =
-              controller.accountingPeriod(validCtutr, inValidStartDate(0), validEndDate)(
-                fakeRequest("live", "correlationid")
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) mustBe expectedJson
-          }
-
-          "end date and CorrelationId  are invalid" in {
-
-            val expectedJson: JsValue = badJsonResponse(
-              ("INVALID_END_DATE", "Invalid query parameter endDate."),
-              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
-            )
-
-            val result: Future[Result] =
-              controller.accountingPeriod(validCtutr, validStartDate, inValidEndDate(0))(
-                fakeRequest("live", "correlationid")
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) mustBe expectedJson
-          }
-
-        }
-
-        "three invalid parameters" when {
-
-          "ctutr, startDate and end date are invalid" in {
-
-            val expectedJson: JsValue = badJsonResponse(
-              ("INVALID_CTUTR", "Invalid parameter ctutr."),
-              ("INVALID_START_DATE", "Invalid query parameter startDate."),
-              ("INVALID_END_DATE", "Invalid query parameter endDate.")
-            )
-
-            val result: Future[Result] =
-              controller.accountingPeriod(inValidCtUtr(0), inValidStartDate(0), inValidEndDate(0))(
-                fakeRequest("live", UUID.randomUUID().toString)
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) mustBe expectedJson
-
-          }
-
-          "ctutr, startDate and correlationId are invalid" in {
-
-            val expectedJson: JsValue = badJsonResponse(
-              ("INVALID_CTUTR", "Invalid parameter ctutr."),
-              ("INVALID_START_DATE", "Invalid query parameter startDate."),
-              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
-            )
-
-            val result: Future[Result] =
-              controller.accountingPeriod(inValidCtUtr(0), inValidStartDate(0), validEndDate)(
-                fakeRequest("live", "correlationId")
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) mustBe expectedJson
-          }
-        }
-
-        "four invalid parameters" when {
-          "ctutr, startDate, endDate and corelationid are invalid" in {
-            val expectedJson: JsValue = badJsonResponse(
-              ("INVALID_CTUTR", "Invalid parameter ctutr."),
-              ("INVALID_START_DATE", "Invalid query parameter startDate."),
-              ("INVALID_END_DATE", "Invalid query parameter endDate."),
-              ("INVALID_CORRELATIONID", "Invalid header CorrelationId.")
-            )
-
-            val result: Future[Result] =
-              controller.accountingPeriod(inValidCtUtr(0), inValidStartDate(0), inValidEndDate(0))(
-                fakeRequest("live", "correlationId")
-              )
-            status(result) shouldBe Status.BAD_REQUEST
-            contentAsJson(result) mustBe expectedJson
-          }
-        }
-
+        status(result) shouldBe Status.UNPROCESSABLE_ENTITY
+        contentAsJson(result) mustBe expectedJson
       }
     }
 

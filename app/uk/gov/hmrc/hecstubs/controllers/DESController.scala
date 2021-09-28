@@ -17,10 +17,12 @@
 package uk.gov.hmrc.hecstubs.controllers
 
 import com.google.inject.Singleton
+
 import javax.inject.Inject
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.hecstubs.models.GetCTUTRDESResponse
 import uk.gov.hmrc.hecstubs.models.GetCTUTRDESResponse.happyDesResponse
+import uk.gov.hmrc.hecstubs.models.companyAccountingPeriod.CTUTR
 import uk.gov.hmrc.hecstubs.util.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -30,7 +32,7 @@ class DESController @Inject() (cc: ControllerComponents) extends BackendControll
   /**
     * Fetch the CTUTR for the given CRN/company number
     * If input CRN starts
-    *    - with 1 -> returns 200 success response
+    *    - with 11 -> returns 200 success response
     *    - with 21 -> returns 404 not found response
     *    - with 22 -> returns 400 bad request response
     *    - with 23 -> returns 500 internal server error response
@@ -40,10 +42,13 @@ class DESController @Inject() (cc: ControllerComponents) extends BackendControll
     * @return HttpResponse
     */
   def getCtutr(crn: String): Action[AnyContent] = Action { _ =>
-    val GetCTUTRDESResponse(status, responseBody) = CompanyProfile
+    val GetCTUTRDESResponse(status, responseBody, _) = CompanyProfile
       .getProfile(crn)
       .flatMap(_.desResponse)
-      .getOrElse(GetCTUTRDESResponse(OK, happyDesResponse))
+      .getOrElse {
+        val ctutr = CTUTR("1111111111")
+        GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))
+      }
     logger.info(s"Responding to get CTUTR from DES for CRN $crn with status $status & body - $responseBody}")
     Status(status)(responseBody)
   }

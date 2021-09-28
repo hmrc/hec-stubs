@@ -20,7 +20,7 @@ import play.api.libs.json.{JsString, Writes}
 
 //Corporation Tax Unique Taxpayer Reference (CTUTR).
 
-final case class CTUTR(value: String) extends AnyVal
+final case class CTUTR(value: String)
 
 object CTUTR {
 
