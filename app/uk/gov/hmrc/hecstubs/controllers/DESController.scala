@@ -29,18 +29,6 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 @Singleton
 class DESController @Inject() (cc: ControllerComponents) extends BackendController(cc) with Logging {
 
-  /**
-    * Fetch the CTUTR for the given CRN/company number
-    * If input CRN starts
-    *    - with 11 -> returns 200 success response
-    *    - with 21 -> returns 404 not found response
-    *    - with 22 -> returns 400 bad request response
-    *    - with 23 -> returns 500 internal server error response
-    *    - with 24 -> returns 503 service unavailable response
-    * If none of the above conditions are satisfied, the result is a 200 success
-    * @param crn The company number
-    * @return HttpResponse
-    */
   def getCtutr(crn: String): Action[AnyContent] = Action { _ =>
     val GetCTUTRDESResponse(status, responseBody, _) = CompanyProfile
       .getProfile(crn)

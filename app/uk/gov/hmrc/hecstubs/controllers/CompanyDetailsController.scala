@@ -27,19 +27,6 @@ import javax.inject.Inject
 @Singleton
 class CompanyDetailsController @Inject() (cc: ControllerComponents) extends BackendController(cc) with Logging {
 
-  /**
-    * The rules to process company number is as follows:
-    * -If company number starts with 1, it gives ok response from company proxy api and CTUTR api.
-    * -If company number starts with 21, it gives ok response from company proxy api but not found from  CTUTR api.
-    * -If company number starts with 22, it gives ok response from company proxy api and BAD_REQUEST from CTUTR api.
-    * -If company number starts with 23, it gives ok response from company proxy api and INTERNAL_SERVER_ERROR from CTUTR api.
-    * -If company number starts with 24, it gives ok response from company proxy api and SERVICE_UNAVAILABLE from CTUTR api.
-    * -If company number starts with 3, it gives NOT_FOUND response from company proxy api.
-    * -If company number starts with 4, it gives INTERNAL_SERVER_ERROR response from company proxy api.
-    * -If company number starts with 5, it gives SERVICE_UNAVAILABLE response from company proxy api.
-    * @param companyNumber
-    * @return HttpResponse
-    */
   def findCompanyName(companyNumber: String): Action[AnyContent] = Action { _ =>
     val response: Option[CompanyHouseResponse] =
       CompanyProfile.getProfile(companyNumber).map(_.companyHouseResponse)
