@@ -40,17 +40,6 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
   val utrRegex          = "^[0-9]{10}$"
   val yearRegex         = "^[0-9]{4}$"
 
-  /**
-    * Fetch the individual account overview based on utr and tax year.
-    * To receive an 500 (Internal Server Error), pass a UTR starting with "3333"
-    * The default status returned is ReturnFound.
-    * Provide SAUTR starting with
-    *  - "1111" to receive a status of NoReturnFound
-    *  - "2222" to receive a status of NoticeToFileIssued
-    * @param utr The individual's UTR
-    * @param taxYear Year the tax year ends
-    * @return Status for the given tax year
-    */
   def individualAccountOverview(utr: String, taxYear: String): Action[AnyContent] = Action { request =>
     val correlationId = request.headers.get("CorrelationId").getOrElse(UUID.randomUUID().toString)
     val environment   = request.headers.get("Environment").flatMap(Environment.getEnvironmentFromString)

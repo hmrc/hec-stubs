@@ -16,19 +16,10 @@
 
 package uk.gov.hmrc.hecstubs.models.companyAccountingPeriod
 
-import play.api.libs.json.{Json, OWrites}
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ReturnStatus
-
 import java.time.LocalDate
 
-final case class AccountingPeriod(
-  accountingPeriodStartDate: LocalDate,
-  accountingPeriodEndDate: LocalDate,
-  accountingPeriodStatus: ReturnStatus
+final case class CompanyAccountingPeriodRequestParameters(
+  ctutr: CTUTR,
+  startDate: LocalDate,
+  endDate: LocalDate
 )
-
-object AccountingPeriod {
-
-  implicit val writes: OWrites[AccountingPeriod] = Json.writes[AccountingPeriod]
-
-}

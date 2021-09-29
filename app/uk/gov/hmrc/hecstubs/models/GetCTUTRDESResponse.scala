@@ -17,15 +17,16 @@
 package uk.gov.hmrc.hecstubs.models
 
 import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.hecstubs.models.companyAccountingPeriod.CTUTR
 
-final case class GetCTUTRDESResponse(status: Int, responseBody: JsValue)
+final case class GetCTUTRDESResponse(status: Int, responseBody: JsValue, ctutr: Option[CTUTR] = None)
 
 object GetCTUTRDESResponse {
 
-  val ctutrRes: String =
+  def ctutrRes(ctutr: CTUTR): String =
     s"""
        |{
-       |  "CTUTR":  "1234567890"
+       |  "CTUTR":  "${ctutr.value}"
        |}
        |""".stripMargin
 
@@ -61,10 +62,10 @@ object GetCTUTRDESResponse {
        |}
        |""".stripMargin
 
-  val happyDesResponse: JsValue          = Json.parse(ctutrRes)
-  val badRequestDesResponse: JsValue     = Json.parse(error400Response)
-  val notFoundDeResponse: JsValue        = Json.parse(error404Response)
-  val serverErrorDesResponse: JsValue    = Json.parse(error500Response)
-  val serviceUnavailDesResponse: JsValue = Json.parse(error503Response)
+  def happyDesResponse(ctutr: CTUTR): JsValue = Json.parse(ctutrRes(ctutr))
+  val badRequestDesResponse: JsValue          = Json.parse(error400Response)
+  val notFoundDeResponse: JsValue             = Json.parse(error404Response)
+  val serverErrorDesResponse: JsValue         = Json.parse(error500Response)
+  val serviceUnavailDesResponse: JsValue      = Json.parse(error503Response)
 
 }

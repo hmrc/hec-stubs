@@ -24,6 +24,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.hecstubs.models.GetCTUTRDESResponse
+import uk.gov.hmrc.hecstubs.models.companyAccountingPeriod.CTUTR
 
 import scala.concurrent.Future
 
@@ -40,10 +41,10 @@ class DESControllerSpec extends AnyWordSpec with Matchers {
     "fetching CTUTR " should {
 
       "return CTUTR if CRN starts with 1" in {
-        val companyNumber          = "1234567"
+        val companyNumber          = "1134567"
         val result: Future[Result] = controller.getCtutr(companyNumber)(fakeRequest)
         status(result) shouldBe Status.OK
-        contentAsJson(result) mustBe GetCTUTRDESResponse.happyDesResponse
+        contentAsJson(result) mustBe GetCTUTRDESResponse.happyDesResponse(CTUTR("1111111111"))
       }
 
       "return 404 not found response if CRN starts with 21" in {
@@ -75,10 +76,24 @@ class DESControllerSpec extends AnyWordSpec with Matchers {
       }
 
       "return CTUTR if CRN starts with anything else" in {
-        Seq("2534567", "3234567", "4234567") foreach { companyNumber =>
+        Seq(
+          "1234567" -> CTUTR("2222222222"),
+          "1334567" -> CTUTR("3333333333"),
+          "1434567" -> CTUTR("4444444444"),
+          "2534567" -> CTUTR("1111111111"),
+          "4134567" -> CTUTR("9999999999"),
+          "4214567" -> CTUTR("9299999998"),
+          "4224567" -> CTUTR("9289999996"),
+          "4234567" -> CTUTR("9279999994"),
+          "4244567" -> CTUTR("9269999992"),
+          "4334567" -> CTUTR("9399999995"),
+          "4434567" -> CTUTR("9499999992"),
+          "4634567" -> CTUTR("9699999997"),
+          "4734567" -> CTUTR("9799999994")
+        ) foreach { case (companyNumber, expectedCTUTR) =>
           val result: Future[Result] = controller.getCtutr(companyNumber)(fakeRequest)
           status(result) shouldBe Status.OK
-          contentAsJson(result) mustBe GetCTUTRDESResponse.happyDesResponse
+          contentAsJson(result) mustBe GetCTUTRDESResponse.happyDesResponse(expectedCTUTR)
         }
       }
 

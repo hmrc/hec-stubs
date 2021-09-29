@@ -16,19 +16,26 @@
 
 package uk.gov.hmrc.hecstubs.models.companyAccountingPeriod
 
-import play.api.libs.json.{Json, OWrites}
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ReturnStatus
+import play.api.libs.json.{JsString, Writes}
 
-import java.time.LocalDate
+sealed trait ReturnLookupStatus extends Product with Serializable {
 
-final case class AccountingPeriod(
-  accountingPeriodStartDate: LocalDate,
-  accountingPeriodEndDate: LocalDate,
-  accountingPeriodStatus: ReturnStatus
-)
+  val value: String
 
-object AccountingPeriod {
+}
 
-  implicit val writes: OWrites[AccountingPeriod] = Json.writes[AccountingPeriod]
+object ReturnLookupStatus {
+
+  case object Successful extends ReturnLookupStatus {
+    override val value: String = "0"
+  }
+
+  case object NoLiveRecords extends ReturnLookupStatus {
+    override val value: String = "2"
+  }
+
+  implicit val writes: Writes[ReturnLookupStatus] = Writes { status =>
+    JsString(status.value)
+  }
 
 }

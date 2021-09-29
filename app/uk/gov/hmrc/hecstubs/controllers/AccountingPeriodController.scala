@@ -20,12 +20,12 @@ import cats.data.Validated.{Invalid, Valid}
 import cats.data.{Validated, ValidatedNel}
 import cats.syntax.apply._
 import com.google.inject.{Inject, Singleton}
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.hecstubs.models.CompanyAccountingPeriodResponse
 import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ErrorCode._
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ReturnStatus.ReturnFound
 import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.{Environment, ErrorResponse, ErrorResult}
-import uk.gov.hmrc.hecstubs.models.companyAccountingPeriod.{AccountingPeriod, CTUTR, CompanyAccountingPeriod}
+import uk.gov.hmrc.hecstubs.models.companyAccountingPeriod.{CTUTR, CompanyAccountingPeriodRequestParameters}
 import uk.gov.hmrc.hecstubs.util.{Logging, ValidationUtils}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -35,10 +35,21 @@ import java.util.UUID
 @Singleton
 class AccountingPeriodController @Inject() (cc: ControllerComponents) extends BackendController(cc) with Logging {
 
-  val badRequestMessage = "Submission has not passed validation."
-  val ctutrRegex        = "^[0-9]{10}$"
-  val dateRegex         =
+  val badRequestMessage                                = "Submission has not passed validation."
+  val ctutrRegex                                       = "^[0-9]{10}$"
+  val dateRegex                                        =
     "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
+  val incompatibleStartAndEndDateResponseJson: JsValue =
+    Json.toJson(
+      ErrorResponse(
+        List(
+          ErrorResult(
+            InvalidDate,
+            "The remote endpoint has indicated that start date is equal to or greater than the end date."
+          )
+        )
+      )
+    )
 
   def accountingPeriod(ctutr: String, startDate: String, endDate: String): Action[AnyContent] = Action { request =>
     val correlationId = request.headers.get("CorrelationId").getOrElse(UUID.randomUUID().toString)
@@ -62,12 +73,23 @@ class AccountingPeriodController @Inject() (cc: ControllerComponents) extends Ba
         )
         BadRequest(Json.toJson(errorResponse))
 
-      case Valid(data) =>
-        val responseJson = Json.toJson(data)
-        logger.info(
-          s"Responding to call for Company Accounting Period  for UTR $ctutr , startDate: $startDate and  endDate: $endDate with JSON: ${responseJson.toString()}"
-        )
-        Ok(responseJson)
+      case Valid(params @ CompanyAccountingPeriodRequestParameters(ctutr, startDate, endDate)) =>
+        if (startDate.isBefore(endDate)) {
+          val (status, responseBody) =
+            CompanyProfile.getProfile(ctutr).flatMap(_.accountingPeriodsIFResponse.map(_(params))) match {
+              case Some(CompanyAccountingPeriodResponse(status, responseBody)) =>
+                status -> responseBody
+
+              case None                                                        =>
+                OK -> CompanyAccountingPeriodResponse.returnFoundResponse(params)
+            }
+          logger.info(
+            s"Responding to call for Company Accounting Period  for UTR $ctutr , startDate: $startDate and " +
+              s"endDate: $endDate with status $status and JSON: ${responseBody.toString()}"
+          )
+          Status(status)(responseBody)
+        } else
+          UnprocessableEntity(incompatibleStartAndEndDateResponseJson)
     }
 
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
@@ -76,7 +98,7 @@ class AccountingPeriodController @Inject() (cc: ControllerComponents) extends Ba
     startDate: String,
     endDate: String,
     correlationId: String
-  ): ValidatedNel[ErrorResult, CompanyAccountingPeriod] = {
+  ): ValidatedNel[ErrorResult, CompanyAccountingPeriodRequestParameters] = {
 
     val ctutrValidation: ValidatedNel[ErrorResult, CTUTR] =
       if (ctutr.matches(ctutrRegex)) Valid(CTUTR(ctutr))
@@ -103,8 +125,7 @@ class AccountingPeriodController @Inject() (cc: ControllerComponents) extends Ba
       ValidationUtils.correlationIdValidation(correlationId)
 
     (ctutrValidation, startDateValidation, endDateValidation, correlationIdValidation).mapN(
-      (ctutr, startDate, endDate, _) =>
-        CompanyAccountingPeriod(ctutr, ReturnFound, List(AccountingPeriod("01", startDate, endDate)))
+      (ctutr, startDate, endDate, _) => CompanyAccountingPeriodRequestParameters(ctutr, startDate, endDate)
     )
 
   }

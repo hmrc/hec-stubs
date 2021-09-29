@@ -36,6 +36,8 @@ object ErrorCode {
 
   case object InvalidEndDate extends ErrorCode { override def value = "INVALID_END_DATE" }
 
+  case object InvalidDate extends ErrorCode { override def value = "INVALID_DATE" }
+
   case object ServerError extends ErrorCode { override def value = "SERVER_ERROR" }
 
   implicit val writes: Writes[ErrorCode] = Writes { invalidCode =>

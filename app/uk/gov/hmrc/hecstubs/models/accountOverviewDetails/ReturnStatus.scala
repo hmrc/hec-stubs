@@ -24,10 +24,12 @@ sealed trait ReturnStatus extends Product with Serializable {
 
 object ReturnStatus {
 
-  case object ReturnFound extends ReturnStatus { override def value = "Return Found" }
-  case object NoticeToFileIssued extends ReturnStatus { override def value = "Notice to File Issued" }
-  case object NoReturnFound extends ReturnStatus { override def value = "No Return Found" }
-  case object NoAccountingPeriodFound extends ReturnStatus { override def value = "No Accounting Period Found" }
+  case object ReturnFound extends ReturnStatus { override def value = "1" }
+
+  case object NoticeToFileIssued extends ReturnStatus { override def value = "2" }
+
+  case object NoReturnFound extends ReturnStatus { override def value = "3" }
+
   implicit val writes: Writes[ReturnStatus] = Writes { status =>
     JsString(status.value)
   }
