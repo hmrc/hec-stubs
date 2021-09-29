@@ -139,6 +139,46 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
 
     "return bad request " when {
 
+      "the CTUTR is 9299999998" in {
+        val expectedJson: JsValue = badJsonResponse(("INVALID_CTUTR", "Invalid parameter ctutr."))
+
+        val result = controller.accountingPeriod("9299999998", validStartDateString, validEndDateString)(
+          fakeRequest("live", UUID.randomUUID().toString)
+        )
+        status(result) shouldBe Status.BAD_REQUEST
+        contentAsJson(result) mustBe expectedJson
+      }
+
+      "the CTUTR is 9289999996" in {
+        val expectedJson: JsValue = badJsonResponse(("INVALID_START_DATE", "Invalid query parameter startDate."))
+
+        val result = controller.accountingPeriod("9289999996", validStartDateString, validEndDateString)(
+          fakeRequest("live", UUID.randomUUID().toString)
+        )
+        status(result) shouldBe Status.BAD_REQUEST
+        contentAsJson(result) mustBe expectedJson
+      }
+
+      "the CTUTR is 9279999994" in {
+        val expectedJson: JsValue = badJsonResponse(("INVALID_END_DATE", "Invalid query parameter endDate."))
+
+        val result = controller.accountingPeriod("9279999994", validStartDateString, validEndDateString)(
+          fakeRequest("live", UUID.randomUUID().toString)
+        )
+        status(result) shouldBe Status.BAD_REQUEST
+        contentAsJson(result) mustBe expectedJson
+      }
+
+      "the CTUTR is 9269999992" in {
+        val expectedJson = badJsonResponse(("INVALID_CORRELATIONID", "Invalid header CorrelationId."))
+
+        val result = controller.accountingPeriod("9269999992", validStartDateString, validEndDateString)(
+          fakeRequest("live", UUID.randomUUID().toString)
+        )
+        status(result) shouldBe Status.BAD_REQUEST
+        contentAsJson(result) mustBe expectedJson
+      }
+
       "One invalid parameter" when {
 
         "ctutr is invalid" in {
@@ -368,7 +408,6 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
           contentAsJson(result) mustBe expectedJson
         }
       }
-
     }
 
     "return unprocessable entity" when {
@@ -385,6 +424,14 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
           |}
           |""".stripMargin
       )
+
+      "the CTUTR is 9399999995" in {
+        val result = controller.accountingPeriod("9399999995", validStartDateString, validEndDateString)(
+          fakeRequest("live", UUID.randomUUID().toString)
+        )
+        status(result) shouldBe Status.UNPROCESSABLE_ENTITY
+        contentAsJson(result) mustBe expectedJson
+      }
 
       "all request parameters can be parsed but the end date is equal to the start date" in {
         val result = controller.accountingPeriod(validCtutr, validStartDateString, validStartDateString)(
@@ -403,5 +450,54 @@ class AccountingPeriodControllerSpec extends AnyWordSpec with Matchers {
       }
     }
 
+    "return not found" when {
+
+      "the CTUTR is 9999999999" in {
+        val result = controller.accountingPeriod("9999999999", validStartDateString, validEndDateString)(
+          fakeRequest("live", UUID.randomUUID().toString)
+        )
+        status(result) shouldBe Status.NOT_FOUND
+        contentAsJson(result) mustBe CompanyAccountingPeriodResponse.error404Response
+      }
+
+    }
+
+    "return internal server error" when {
+
+      "the CTUTR is 9499999992" in {
+        val result = controller.accountingPeriod("9499999992", validStartDateString, validEndDateString)(
+          fakeRequest("live", UUID.randomUUID().toString)
+        )
+        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+        contentAsJson(result) mustBe CompanyAccountingPeriodResponse.error500Response
+      }
+
+    }
+
+    "return bad gateway" when {
+
+      "the CTUTR is 9699999997" in {
+        val result = controller.accountingPeriod("9699999997", validStartDateString, validEndDateString)(
+          fakeRequest("live", UUID.randomUUID().toString)
+        )
+        status(result) shouldBe Status.BAD_GATEWAY
+        contentAsJson(result) mustBe CompanyAccountingPeriodResponse.error502Response
+      }
+
+    }
+
+    "return service unavailable" when {
+
+      "the CTUTR is 9799999994" in {
+        val result = controller.accountingPeriod("9799999994", validStartDateString, validEndDateString)(
+          fakeRequest("live", UUID.randomUUID().toString)
+        )
+        status(result) shouldBe Status.SERVICE_UNAVAILABLE
+        contentAsJson(result) mustBe CompanyAccountingPeriodResponse.error503Response
+      }
+
+    }
+
   }
+
 }

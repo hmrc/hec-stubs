@@ -96,27 +96,81 @@ object CompanyAccountingPeriodResponse {
   val error404Response: JsValue =
     Json.parse(s"""
        |{
-       |   "code": "NOT_FOUND",
-       |   "reason": " The remote endpoint has indicated that no data can be found for the given identifier."
+       |   "failures": [
+       |     {
+       |       "code": "NOT_FOUND",
+       |       "reason": " The remote endpoint has indicated that no data can be found for the given identifier."
+       |     }
+       |   ]  
        |}
        |""".stripMargin)
 
-  val error400Response: JsValue =
+  val error400InvalidCTUTRResponse: JsValue =
     Json.parse(
       s"""
        |{
-       |   "code": "INVALID_CTUTR",
-       |   "reason": "Submission has not passed validation. Invalid parameter ctutr."
+       |   "failures": [
+       |     {
+       |      "code": "INVALID_CTUTR",
+       |      "reason": "Submission has not passed validation. Invalid parameter ctutr."
+       |      }
+       |   ]  
        |}
        |""".stripMargin
+    )
+
+  val error400InvalidStartDateResponse: JsValue =
+    Json.parse(
+      s"""
+         |{
+         |   "failures": [
+         |     {
+         |        "code": "INVALID_START_DATE",
+         |        "reason": "Submission has not passed validation. Invalid query parameter startDate."
+         |      }
+         |   ]  
+         |}
+         |""".stripMargin
+    )
+
+  val error400InvalidEndDateResponse: JsValue =
+    Json.parse(
+      s"""
+         |{
+         |   "failures": [
+         |     {
+         |       "code": "INVALID_END_DATE",
+         |       "reason": "Submission has not passed validation. Invalid query parameter endDate."
+         |      }
+         |   ]  
+         |}
+         |""".stripMargin
+    )
+
+  val error400InvalidCorrelationIdResponse: JsValue =
+    Json.parse(
+      s"""
+         |{
+         |   "failures": [
+         |     {
+         |       "code": "INVALID_CORRELATIONID",
+         |       "reason": "Submission has not passed validation. Invalid header CorrelationId."
+         |      }
+         |   ]  
+         |}
+         |""".stripMargin
     )
 
   val error422Response: JsValue =
     Json.parse(
       s"""
        |{
-       |   "code": "INVALID_DATE",
-       |   "reason": "The remote endpoint has indicated that start date is equal to or greater than the end date."
+       |   "failures": [
+       |     {
+       |       "code": "INVALID_DATE",
+       |       "reason": "The remote endpoint has indicated that start date is equal to or greater than the end date."
+       |      }
+       |   ]  
        |}
        |""".stripMargin
     )
@@ -125,8 +179,12 @@ object CompanyAccountingPeriodResponse {
     Json.parse(
       s"""
        |{
-       |   "code": "SERVER_ERROR",
-       |   "reason": "IF is currently experiencing problems that require live service intervention."
+       |   "failures": [
+       |     {
+       |       "code": "SERVER_ERROR",
+       |       "reason": "IF is currently experiencing problems that require live service intervention."
+       |      }
+       |   ]  
        |}
        |""".stripMargin
     )
@@ -134,8 +192,12 @@ object CompanyAccountingPeriodResponse {
     Json.parse(
       s"""
        |{
-       |   "code": "BAD_GATEWAY",
-       |   "reason": "Depending systems are currently not responding"
+       |   "failures": [
+       |     {
+       |       "code": "BAD_GATEWAY",
+       |       "reason": "Dependent systems are currently not responding."
+       |      }
+       |   ]  
        |}
        |""".stripMargin
     )
@@ -144,8 +206,12 @@ object CompanyAccountingPeriodResponse {
     Json.parse(
       s"""
        |{
-       |   "code": "SERVICE_UNAVAILABLE",
-       |   "reason": "Depending systems are currently not responding"
+       |   "failures": [
+       |     {
+       |       "code": "SERVICE_UNAVAILABLE",
+       |       "reason": "Dependent systems are currently not responding."
+       |      }
+       |   ]  
        |}
        |""".stripMargin
     )

@@ -117,57 +117,100 @@ object CompanyProfile {
       _.startsWith("41"),
       CompanyHouseResponse(OK, Some(houseResponse)),
       Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
-      Some(_ => CompanyAccountingPeriodResponse(OK, CompanyAccountingPeriodResponse.error404Response))
+      Some(_ => CompanyAccountingPeriodResponse(NOT_FOUND, CompanyAccountingPeriodResponse.error404Response))
     )
   }
 
   val profile13: CompanyProfile = {
     val ctutr = CTUTR("9299999998")
     CompanyProfile(
-      _.startsWith("42"),
+      _.startsWith("421"),
       CompanyHouseResponse(OK, Some(houseResponse)),
       Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
-      Some(_ => CompanyAccountingPeriodResponse(OK, CompanyAccountingPeriodResponse.error400Response))
+      Some(_ =>
+        CompanyAccountingPeriodResponse(BAD_REQUEST, CompanyAccountingPeriodResponse.error400InvalidCTUTRResponse)
+      )
     )
   }
 
   val profile14: CompanyProfile = {
+    val ctutr = CTUTR("9289999996")
+    CompanyProfile(
+      _.startsWith("422"),
+      CompanyHouseResponse(OK, Some(houseResponse)),
+      Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
+      Some(_ =>
+        CompanyAccountingPeriodResponse(BAD_REQUEST, CompanyAccountingPeriodResponse.error400InvalidStartDateResponse)
+      )
+    )
+  }
+
+  val profile15: CompanyProfile = {
+    val ctutr = CTUTR("9279999994")
+    CompanyProfile(
+      _.startsWith("423"),
+      CompanyHouseResponse(OK, Some(houseResponse)),
+      Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
+      Some(_ =>
+        CompanyAccountingPeriodResponse(BAD_REQUEST, CompanyAccountingPeriodResponse.error400InvalidEndDateResponse)
+      )
+    )
+  }
+
+  val profile16: CompanyProfile = {
+    val ctutr = CTUTR("9269999992")
+    CompanyProfile(
+      _.startsWith("424"),
+      CompanyHouseResponse(OK, Some(houseResponse)),
+      Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
+      Some(_ =>
+        CompanyAccountingPeriodResponse(
+          BAD_REQUEST,
+          CompanyAccountingPeriodResponse.error400InvalidCorrelationIdResponse
+        )
+      )
+    )
+  }
+
+  val profile17: CompanyProfile = {
     val ctutr = CTUTR("9399999995")
     CompanyProfile(
       _.startsWith("43"),
       CompanyHouseResponse(OK, Some(houseResponse)),
       Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
-      Some(_ => CompanyAccountingPeriodResponse(OK, CompanyAccountingPeriodResponse.error422Response))
+      Some(_ => CompanyAccountingPeriodResponse(UNPROCESSABLE_ENTITY, CompanyAccountingPeriodResponse.error422Response))
     )
   }
 
-  val profile15: CompanyProfile = {
+  val profile18: CompanyProfile = {
     val ctutr = CTUTR("9499999992")
     CompanyProfile(
       _.startsWith("44"),
       CompanyHouseResponse(OK, Some(houseResponse)),
       Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
-      Some(_ => CompanyAccountingPeriodResponse(OK, CompanyAccountingPeriodResponse.error500Response))
+      Some(_ =>
+        CompanyAccountingPeriodResponse(INTERNAL_SERVER_ERROR, CompanyAccountingPeriodResponse.error500Response)
+      )
     )
   }
 
-  val profile16: CompanyProfile = {
+  val profile19: CompanyProfile = {
     val ctutr = CTUTR("9699999997")
     CompanyProfile(
       _.startsWith("46"),
       CompanyHouseResponse(OK, Some(houseResponse)),
       Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
-      Some(_ => CompanyAccountingPeriodResponse(OK, CompanyAccountingPeriodResponse.error502Response))
+      Some(_ => CompanyAccountingPeriodResponse(BAD_GATEWAY, CompanyAccountingPeriodResponse.error502Response))
     )
   }
 
-  val profile17: CompanyProfile = {
+  val profile20: CompanyProfile = {
     val ctutr = CTUTR("9799999994")
     CompanyProfile(
       _.startsWith("47"),
       CompanyHouseResponse(OK, Some(houseResponse)),
       Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
-      Some(_ => CompanyAccountingPeriodResponse(OK, CompanyAccountingPeriodResponse.error503Response))
+      Some(_ => CompanyAccountingPeriodResponse(SERVICE_UNAVAILABLE, CompanyAccountingPeriodResponse.error503Response))
     )
   }
 
@@ -189,7 +232,10 @@ object CompanyProfile {
       profile14,
       profile15,
       profile16,
-      profile17
+      profile17,
+      profile18,
+      profile19,
+      profile20
     )
 
   def getProfile(crnReference: String): Option[CompanyProfile] =
