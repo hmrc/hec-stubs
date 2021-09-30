@@ -7,8 +7,7 @@ object AppDependencies {
     "uk.gov.hmrc"   %% "bootstrap-backend-play-28" % "5.14.0",
     "org.typelevel" %% "cats-core"                 % "2.6.1"
   )
-
-  val test = Seq(
+  val test    = Seq(
     "uk.gov.hmrc"            %% "bootstrap-test-play-28" % "5.14.0"            % Test,
     "org.scalatest"          %% "scalatest"              % "3.2.10"            % Test,
     "org.jsoup"               % "jsoup"                  % "1.14.2"            % Test,
