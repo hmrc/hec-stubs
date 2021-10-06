@@ -98,7 +98,7 @@ object CompanyAccountingPeriodResponse {
        |{
        |   "failures": [
        |     {
-       |       "code": "NOT_FOUND",
+       |       "code": "NO_DATA_FOUND",
        |       "reason": " The remote endpoint has indicated that no data can be found for the given identifier."
        |     }
        |   ]  
