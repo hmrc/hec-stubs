@@ -34,9 +34,10 @@
 | ------------- | ------------- | ------------------------- | --------------------------- |
 | `NS...`       | `01-12-1922`  | -                         |  -                          |
 | anything else | `01-12-1922`  | `1234567895`              | return found                | 
-| -             | -             | `1111...`                 | return found                | 
+| -             | -             | `1111...`                 | no return found             | 
 | -             | -             | `2222...`                 | notice to file issued       | 
 | -             | -             | `3333...`                 | 500 (Internal Server Error) | 
+| -             | -             | anything else             | return found                |      
 
 ### License
 
