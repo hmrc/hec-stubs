@@ -1,6 +1,6 @@
 ## citizen details
-GET       /citizen-details/nino-no-suffix/:ninoNoSuffix                         uk.gov.hmrc.hecstubs.controllers.CitizenDetailsController.citizenDetails(ninoNoSuffix)
+GET       /citizen-details/nino/:nino                                           uk.gov.hmrc.hecstubs.controllers.CitizenDetailsController.citizenDetails(nino)
 GET       /individuals/self-assessment/account-overview/:utr/:taxYear           uk.gov.hmrc.hecstubs.controllers.IndividualAccountOverviewController.individualAccountOverview(utr, taxYear)
 GET       /organisations/corporation-tax/:ctutr/company/accounting-periods      uk.gov.hmrc.hecstubs.controllers.AccountingPeriodController.accountingPeriod(ctutr, startDate, endDate)
-GET       /companies-house-api-proxy/company/:companynumber                      uk.gov.hmrc.hecstubs.controllers.CompanyDetailsController.findCompanyName(companynumber)
+GET       /companies-house-api-proxy/company/:companynumber                     uk.gov.hmrc.hecstubs.controllers.CompanyDetailsController.findCompanyName(companynumber)
 GET       /corporation-tax/identifiers/crn/:crn                                 uk.gov.hmrc.hecstubs.controllers.DESController.getCtutr(crn)

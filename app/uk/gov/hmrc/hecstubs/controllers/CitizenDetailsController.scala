@@ -26,8 +26,8 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 @Singleton
 class CitizenDetailsController @Inject() (cc: ControllerComponents) extends BackendController(cc) with Logging {
 
-  def citizenDetails(ninoNoSuffix: String): Action[AnyContent] = Action { _ =>
-    val maybeUtr     = if (ninoNoSuffix.startsWith("NS")) None else Some("1234567895")
+  def citizenDetails(nino: String): Action[AnyContent] = Action { _ =>
+    val maybeUtr     = if (nino.startsWith("NS")) None else Some("1234567895")
     val responseJson =
       Json.toJson(
         CidPerson(
@@ -37,7 +37,7 @@ class CitizenDetailsController @Inject() (cc: ControllerComponents) extends Back
         )
       )
 
-    logger.info(s"Responding to call for citizen details for NINO $ninoNoSuffix with JSON: ${responseJson.toString()}")
+    logger.info(s"Responding to call for citizen details for NINO $nino with JSON: ${responseJson.toString()}")
     Ok(responseJson)
   }
 }
