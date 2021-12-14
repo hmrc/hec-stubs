@@ -4,3 +4,6 @@ GET       /individuals/self-assessment/account-overview/:utr/:taxYear           
 GET       /organisations/corporation-tax/:ctutr/company/accounting-periods      uk.gov.hmrc.hecstubs.controllers.AccountingPeriodController.accountingPeriod(ctutr, startDate, endDate)
 GET       /companies-house-api-proxy/company/:companynumber                     uk.gov.hmrc.hecstubs.controllers.CompanyDetailsController.findCompanyName(companynumber)
 GET       /corporation-tax/identifiers/crn/:crn                                 uk.gov.hmrc.hecstubs.controllers.DESController.getCtutr(crn)
+
+POST      /email-verification/request-passcode                                  uk.gov.hmrc.hecstubs.controllers.EmailVerificationController.requestPasscode
+POST      /email-verification/verify-passcode                                   uk.gov.hmrc.hecstubs.controllers.EmailVerificationController.verifyPasscode
