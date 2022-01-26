@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.hecstubs.controllers
 
+import cats.syntax.eq._
+import cats.instances.string._
 import play.api.http.Status._
 import uk.gov.hmrc.hecstubs.models.companyAccountingPeriod.{CTUTR, CompanyAccountingPeriodRequestParameters}
 import uk.gov.hmrc.hecstubs.models.{CompanyAccountingPeriodResponse, CompanyHouseResponse, GetCTUTRDESResponse}
@@ -214,8 +216,63 @@ object CompanyProfile {
     )
   }
 
+  val integrationTestProfile1: CompanyProfile = {
+    val ctutr = CTUTR("8771007961")
+    CompanyProfile(
+      _ === "OC785504",
+      CompanyHouseResponse(OK, Some(houseResponseWithName("HAYBANK EARPHONE"))),
+      Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
+      Some(r => CompanyAccountingPeriodResponse(OK, CompanyAccountingPeriodResponse.returnFoundResponse(r)))
+    )
+  }
+
+  val integrationTestProfile2: CompanyProfile = {
+    val ctutr = CTUTR("5611619515")
+    CompanyProfile(
+      _ === "OC785017",
+      CompanyHouseResponse(OK, Some(houseResponseWithName("HENDON EQUESTRIAN"))),
+      Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
+      Some(r => CompanyAccountingPeriodResponse(OK, CompanyAccountingPeriodResponse.noticeToFileIssuedResponse(r)))
+    )
+  }
+
+  val integrationTestProfile3: CompanyProfile = {
+    val ctutr = CTUTR("2882518770")
+    CompanyProfile(
+      _ === "OC785016",
+      CompanyHouseResponse(OK, Some(houseResponseWithName("HALE EYEGLASS"))),
+      Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
+      Some(r => CompanyAccountingPeriodResponse(OK, CompanyAccountingPeriodResponse.noReturnFoundResponse(r)))
+    )
+  }
+
+  val integrationTestProfile4: CompanyProfile = {
+    val ctutr = CTUTR("5678515567")
+    CompanyProfile(
+      _ === "OC785501",
+      CompanyHouseResponse(OK, Some(houseResponseWithName("HARLEY ENGINEERING"))),
+      Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
+      Some(r => CompanyAccountingPeriodResponse(OK, CompanyAccountingPeriodResponse.noAccountingPeriodsResponse(r)))
+    )
+  }
+
+  val integrationTestProfile5: CompanyProfile = {
+    val ctutr = CTUTR("8991310793")
+    CompanyProfile(
+      _ === "OC785502",
+      CompanyHouseResponse(OK, Some(houseResponseWithName("HIGHLEY HEALDRY"))),
+      Some(GetCTUTRDESResponse(OK, happyDesResponse(ctutr), Some(ctutr))),
+      Some(r => CompanyAccountingPeriodResponse(OK, CompanyAccountingPeriodResponse.noAccountingPeriodsResponse(r)))
+    )
+  }
+
   private val profiles: List[CompanyProfile] =
     List(
+      integrationTestProfile1,
+      integrationTestProfile2,
+      integrationTestProfile3,
+      integrationTestProfile4,
+      integrationTestProfile5,
       profile1,
       profile2,
       profile3,
