@@ -32,7 +32,7 @@ object CompanyHouseResponse {
   def houseResponseWithName(companyName: String): JsValue =
     Json.parse(
       s"""
-       |{"company_name" : "$companyName""}
+       |{ "company_name" : "$companyName" }
        |""".stripMargin
     )
 }
