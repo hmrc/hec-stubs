@@ -21,10 +21,18 @@ import play.api.libs.json.{JsValue, Json}
 final case class CompanyHouseResponse(status: Int, responseBody: Option[JsValue])
 
 object CompanyHouseResponse {
+
   val companyName: String =
     s"""
        |{"company_name" : "Test Tech Ltd"}
        |""".stripMargin
 
   val houseResponse: JsValue = Json.parse(companyName)
+
+  def houseResponseWithName(companyName: String): JsValue =
+    Json.parse(
+      s"""
+       |{ "company_name" : "$companyName" }
+       |""".stripMargin
+    )
 }
