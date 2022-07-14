@@ -17,8 +17,9 @@ frontend service will be rooted in the company registration number (CRN). The co
 - The `CT status` columns describes the response to the CT return status API. The input to the API is the CT UTR of the  
   company
  
-If using a stubbed login, the CT UTR can either be given as an enrolment or entered in as part of the applicant frontend
-journey if a CT enrolment has not been given with the CT UTR which matches the CRN given in the journey.
+If using a stubbed login, then the CT UTR can either be given as an enrolment or entered in as part of the applicant 
+frontend journey if the login has not been configured with a CT enrolment with the CT UTR which matches the CRN given 
+in the journey.
 
 | CRN      | Company Name                | CT UTR                      | CT status                                |
 | -------- |-----------------------------| --------------------------- | ---------------------------------------- |
@@ -53,7 +54,7 @@ frontend service will be rooted in the national insurance number (NINO) and the 
   returned by the stub is always the same
 - the `SA status` column describes the stub responses to the SA return status API. The input to this API is an SA UTR 
 
-If using a stubbed login, to be able to use an SA UTR which is different thn `1234567895` use an `NS...` NINO in the 
+If using a stubbed login, then to be able to use an SA UTR which is different thn `1234567895` use an `NS...` NINO in the 
 login together with an SA enrolment that contains the desired SA UTR. 
 
 
