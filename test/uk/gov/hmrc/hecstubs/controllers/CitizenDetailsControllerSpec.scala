@@ -39,6 +39,12 @@ class CitizenDetailsControllerSpec extends AnyWordSpec with Matchers {
 
     "fetching citizen details " should {
 
+      "return a 404 response if the first three digits of the NINO is 404" in {
+        val nino                   = "SS404123C"
+        val result: Future[Result] = controller.citizenDetails(nino)(fakeRequest)
+        status(result) shouldBe Status.NOT_FOUND
+      }
+
       "not return the UTR if NINO starts with NS" in {
         val nino                   = "NS123456"
         val expectedJson: JsValue  = Json.parse(s"""
