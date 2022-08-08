@@ -58,14 +58,15 @@ If using a stubbed login, then to be able to use an SA UTR which is different fr
 login together with an SA enrolment that contains the desired SA UTR. 
 
 
-| NINO          | Date of Birth | SA UTR        | SA status                   |
-| ------------- | ------------- |---------------| --------------------------- |
-| `NS...`       | `01-12-1922`  | -             |  -                          |
-| anything else | `01-12-1922`  | `1234567895`  | return found                |
-| -             | -             | `1111...`     | no return found             |
-| -             | -             | `2222...`     | notice to file issued       |
-| -             | -             | `3333...`     | 500 (Internal Server Error) |
-| -             | -             | anything else | return found                |
+| NINO          | Date of Birth     | SA UTR          | SA status                   |
+|---------------|-------------------|-----------------| --------------------------- |
+| `SS404...`    | 404 (NOT FOUND)   | 404 (NOT FOUND) |  -                          |
+| `NS...`       | `01-12-1922`      | -               |  -                          |
+| anything else | `01-12-1922`      | `1234567895`    | return found                |
+| -             | -                 | `1111...`       | no return found             |
+| -             | -                 | `2222...`       | notice to file issued       |
+| -             | -                 | `3333...`       | 500 (Internal Server Error) |
+| -             | -                 | anything else   | return found                |
 
 ## Email verification data
 

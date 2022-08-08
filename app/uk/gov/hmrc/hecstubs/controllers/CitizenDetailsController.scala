@@ -27,17 +27,23 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 class CitizenDetailsController @Inject() (cc: ControllerComponents) extends BackendController(cc) with Logging {
 
   def citizenDetails(nino: String): Action[AnyContent] = Action { _ =>
-    val maybeUtr     = if (nino.startsWith("NS")) None else Some("1234567895")
-    val responseJson =
-      Json.toJson(
-        CidPerson(
-          Some(CidNames(Some(CidName(Some("Karen"), Some("McKarenFace"))))),
-          TaxIds(maybeUtr),
-          Some("01121922")
-        )
-      )
+    nino match {
+      case notFoundRegex() => NotFound
+      case _               =>
+        val maybeUtr     = if (nino.startsWith("NS")) None else Some("1234567895")
+        val responseJson =
+          Json.toJson(
+            CidPerson(
+              Some(CidNames(Some(CidName(Some("Karen"), Some("McKarenFace"))))),
+              TaxIds(maybeUtr),
+              Some("01121922")
+            )
+          )
 
-    logger.info(s"Responding to call for citizen details for NINO $nino with JSON: ${responseJson.toString()}")
-    Ok(responseJson)
+        logger.info(s"Responding to call for citizen details for NINO $nino with JSON: ${responseJson.toString()}")
+        Ok(responseJson)
+    }
   }
+
+  private val notFoundRegex = "SS404.*".r
 }
