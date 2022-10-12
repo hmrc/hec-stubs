@@ -65,6 +65,28 @@ class CitizenDetailsControllerSpec extends AnyWordSpec with Matchers {
         contentAsJson(result) mustBe expectedJson
       }
 
+      "return the SA NotFound UTR if NINO start with SN404" in {
+        val nino                   = "SN404002A"
+        val expectedJson: JsValue  = Json.parse(s"""
+                                                   |{
+                                                   |    "name": {
+                                                   |      "current": {
+                                                   |        "firstName": "Karen",
+                                                   |        "lastName": "McKarenFace"
+                                                   |      }
+                                                   |    },
+                                                   |    "ids": {
+                                                   |      "sautr": "1233211231"
+                                                   |    },
+                                                   |    "dateOfBirth": "01121922"
+                                                   |}
+                                                   |""".stripMargin)
+        val result: Future[Result] =
+          controller.citizenDetails(nino)(fakeRequest)
+        status(result) shouldBe Status.OK
+        contentAsJson(result) mustBe expectedJson
+      }
+
       "return the UTR if NINO does not start with NS" in {
         val nino                   = "1234567890"
         val expectedJson: JsValue  = Json.parse(s"""

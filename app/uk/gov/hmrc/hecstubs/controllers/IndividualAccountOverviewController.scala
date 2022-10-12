@@ -47,6 +47,8 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
       case Some(_) =>
         if (utr.startsWith("3333")) {
           InternalServerError
+        } else if (utr.endsWith("1231")) {
+          NotFound
         } else {
           validateIndividualDetails(utr, taxYear, correlationId) match {
             case Invalid(errorList) =>

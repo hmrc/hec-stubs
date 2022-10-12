@@ -88,6 +88,15 @@ class IndividualAccountOverviewControllerSpec extends AnyWordSpec with Matchers 
           contentAsJson(result) mustBe expectedJson
         }
 
+        "utr ends with 1231 return NOT_FOUND" in {
+          val utr                    = "1233211231"
+          val result: Future[Result] =
+            controller.individualAccountOverview(utr, validTaxYear)(
+              fakeRequest("live", UUID.randomUUID().toString)
+            )
+          status(result) shouldBe Status.NOT_FOUND
+        }
+
         "utr starts with any other string" in {
           val utr                    = "1234567890"
           val expectedJson: JsValue  = Json.parse(s"""
