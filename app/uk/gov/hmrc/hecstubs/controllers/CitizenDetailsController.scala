@@ -30,7 +30,12 @@ class CitizenDetailsController @Inject() (cc: ControllerComponents) extends Back
     nino match {
       case notFoundRegex() => NotFound
       case _               =>
-        val maybeUtr     = if (nino.startsWith("NS")) None else Some("1234567895")
+        val maybeUtr     =
+          nino match {
+            case ni if ni.startsWith("NS") => None
+            case saStatusNotFoundRegex()   => Some("1233211231")
+            case _                         => Some("1234567895")
+          }
         val responseJson =
           Json.toJson(
             CidPerson(
@@ -45,5 +50,6 @@ class CitizenDetailsController @Inject() (cc: ControllerComponents) extends Back
     }
   }
 
-  private val notFoundRegex = "SS404.*".r
+  private val notFoundRegex         = "SS404.*".r
+  private val saStatusNotFoundRegex = "SN404.*".r
 }
