@@ -80,7 +80,7 @@ class AccountingPeriodController @Inject() (cc: ControllerComponents) extends Ba
               case Some(CompanyAccountingPeriodResponse(status, responseBody)) =>
                 status -> responseBody
 
-              case None                                                        =>
+              case None =>
                 OK -> CompanyAccountingPeriodResponse.returnFoundResponse(params)
             }
           logger.info(
