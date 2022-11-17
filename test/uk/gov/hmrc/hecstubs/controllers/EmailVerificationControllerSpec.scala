@@ -33,7 +33,7 @@ class EmailVerificationControllerSpec extends AnyWordSpec with Matchers {
   def requestWithJsonBody(json: JsValue) =
     FakeRequest().withBody(json).withHeaders(CONTENT_TYPE -> JSON)
 
-  val controller                         = new EmailVerificationController(mockCC)
+  val controller = new EmailVerificationController(mockCC)
 
   def checkErrorCode(result: Future[Result], expectedErrorCode: String) =
     (contentAsJson(result).as[JsObject] \ "code") shouldBe JsDefined(JsString(expectedErrorCode))

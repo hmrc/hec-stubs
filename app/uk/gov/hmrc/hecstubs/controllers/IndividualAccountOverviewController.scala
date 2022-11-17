@@ -77,8 +77,7 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
   private val noReturnUtrPrefix           = "1111"
   private val noticeToFileIssuedUtrPrefix = "2222"
 
-  /**
-    * validating the utr, year and correlation id
+  /** validating the utr, year and correlation id
     */
   @SuppressWarnings(Array("org.wartremover.warts.Any"))
   private def validateIndividualDetails(
@@ -87,18 +86,16 @@ class IndividualAccountOverviewController @Inject() (cc: ControllerComponents)
     correlationId: String
   ): ValidatedNel[ErrorResult, IndividualAccountOverview] = {
 
-    val utrValidation: ValidatedNel[ErrorResult, SAUTR] = {
+    val utrValidation: ValidatedNel[ErrorResult, SAUTR] =
       if (utr.matches(utrRegex)) Valid(SAUTR(utr))
       else Validated.invalidNel(ErrorResult(InvalidUTR, s"$badRequestMessage Invalid parameter utr."))
-    }
 
-    val taxYearValidation: ValidatedNel[ErrorResult, String] = {
-      if (taxYear.matches(yearRegex)) Valid((taxYear.toInt).toString)
+    val taxYearValidation: ValidatedNel[ErrorResult, String]       =
+      if (taxYear.matches(yearRegex)) Valid(taxYear.toInt.toString)
       else
         Validated.invalidNel(
           ErrorResult(InvalidTaxYear, s"$badRequestMessage Invalid parameter taxYear.")
         )
-    }
     val correlationIdValidation: ValidatedNel[ErrorResult, String] = Try(
       UUID.fromString(correlationId)
     ).toOption match {
