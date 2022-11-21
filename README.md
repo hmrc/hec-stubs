@@ -100,6 +100,26 @@ strings that form part of the JSON response body in the case of an error.
 | `GGGGGG`      | 204 (no content)         | -                                |
 | anything else | 201 (created)            | -                                |
 
+### Scalafmt
+This repository uses [Scalafmt](https://scalameta.org/scalafmt/), a code formatter for Scala. The formatting rules configured for this repository are defined within [.scalafmt.conf](.scalafmt.conf).
+
+To apply formatting to this repository using the configured rules in [.scalafmt.conf](.scalafmt.conf) execute:
+
+ ```
+ sbt scalafmtAll
+ ```
+To apply formatting to files in the project folder execute:
+
+ ```
+ sbt scalafmtSbt
+ ```
+To check files have been formatted as expected execute:
+
+ ```
+ sbt scalafmtCheckAll scalafmtSbtCheck
+ ```
+
+[Visit the official Scalafmt documentation to view a complete list of tasks which can be run.](https://scalameta.org/scalafmt/docs/installation.html#task-keys)
 
 ### License
 
