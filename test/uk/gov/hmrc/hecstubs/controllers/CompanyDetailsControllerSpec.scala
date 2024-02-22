@@ -133,6 +133,12 @@ class CompanyDetailsControllerSpec extends AnyWordSpec with Matchers {
 
     }
 
+    "return 404 when no company house response is retrieved" in {
+
+      val result = controller.findCompanyName("foo")(fakeRequest)
+      status(result) mustBe NOT_FOUND
+    }
+
   }
 
 }

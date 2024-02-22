@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.hecstubs.controllers
 
-import akka.stream.testkit.NoMaterializer
+import org.apache.pekko.stream.testkit.NoMaterializer
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsDefined, JsObject, JsString, JsValue, Json}
