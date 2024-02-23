@@ -2,12 +2,24 @@ import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 
 val appName = "hec-stubs"
 
+lazy val scoverageSettings = {
+  import scoverage.ScoverageKeys
+  Seq(
+    // Semicolon-separated list of regexs matching classes to exclude
+    ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;.*config.*;.*BuildInfo.;uk.gov.hmrc.BuildInfo;.*Routes;.*RoutesPrefix*",
+    ScoverageKeys.coverageMinimumStmtTotal := 96,
+    ScoverageKeys.coverageFailOnMinimum := true,
+    ScoverageKeys.coverageHighlighting := true,
+    Test / parallelExecution := false
+  )
+}
+
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
   .settings(
     majorVersion := 0,
-    scalaVersion := "2.13.10",
+    scalaVersion := "2.13.12",
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     scalacOptions := Seq(
       "-Ymacro-annotations",
@@ -22,8 +34,7 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always),
     Compile / doc / sources := Seq.empty
   )
-  .configs(IntegrationTest)
-  .settings(integrationTestSettings(): _*)
   .settings(resolvers += Resolver.jcenterRepo)
   .settings(scalafmtOnCompile := true)
   .settings(PlayKeys.playDefaultPort := 10109)
+  .settings(scoverageSettings:_*)
