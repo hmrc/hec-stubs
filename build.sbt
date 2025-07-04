@@ -15,7 +15,7 @@ lazy val scoverageSettings = {
 }
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
   .settings(
     majorVersion := 0,
@@ -34,7 +34,6 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencySchemes ++= Seq("org.scala-lang.modules" %% "scala-xml" % VersionScheme.Always),
     Compile / doc / sources := Seq.empty
   )
-  .settings(resolvers += Resolver.jcenterRepo)
   .settings(scalafmtOnCompile := true)
   .settings(PlayKeys.playDefaultPort := 10109)
   .settings(scoverageSettings: _*)
