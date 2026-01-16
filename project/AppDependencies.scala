@@ -2,7 +2,7 @@ import sbt.*
 
 object AppDependencies {
 
-  val bootStrapVersion = "10.4.0"
+  val bootStrapVersion = "10.5.0"
   val playVersion      = "play-30"
 
   val compile = Seq(
