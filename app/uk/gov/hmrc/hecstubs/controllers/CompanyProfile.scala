@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.hecstubs.controllers
 
-import cats.syntax.eq._
-import cats.instances.string._
-import play.api.http.Status._
+import cats.syntax.eq.*
+import cats.instances.string.*
+import play.api.http.Status.*
 import uk.gov.hmrc.hecstubs.models.companyAccountingPeriod.{CTUTR, CompanyAccountingPeriodRequestParameters}
 import uk.gov.hmrc.hecstubs.models.{CompanyAccountingPeriodResponse, CompanyHouseResponse, GetCTUTRDESResponse}
 
@@ -31,8 +31,8 @@ final case class CompanyProfile(
 )
 
 object CompanyProfile {
-  import CompanyHouseResponse._
-  import GetCTUTRDESResponse._
+  import CompanyHouseResponse.*
+  import GetCTUTRDESResponse.*
 
   val profile1: CompanyProfile = {
     val ctutr = CTUTR("1111111111")
