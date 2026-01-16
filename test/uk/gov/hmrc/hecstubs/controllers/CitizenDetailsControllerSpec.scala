@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.hecstubs.controllers
 
-import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
+import org.scalatest.matchers.must.Matchers._
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status
@@ -55,7 +55,7 @@ class CitizenDetailsControllerSpec extends AnyWordSpec with Matchers {
              |        "lastName": "McKarenFace"
              |      }
              |    },
-             |    "ids": {},
+             |    "ids": {"sautr":null},
              |    "dateOfBirth": "01121922"
              |}
              |""".stripMargin)
