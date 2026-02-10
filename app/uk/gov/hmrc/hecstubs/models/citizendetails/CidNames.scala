@@ -22,6 +22,10 @@ final case class CidNames(current: Option[CidName]) extends AnyVal
 
 object CidNames {
 
-  implicit val writes: OWrites[CidNames] = Json.writes[CidNames]
+  implicit val writes: OWrites[CidNames] = OWrites { c =>
+    Json.obj(
+      "current" -> c.current
+    )
+  }
 
 }

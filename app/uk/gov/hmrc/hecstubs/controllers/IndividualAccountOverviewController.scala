@@ -18,13 +18,13 @@ package uk.gov.hmrc.hecstubs.controllers
 
 import cats.data.Validated.{Invalid, Valid}
 import cats.data.{Validated, ValidatedNel}
-import cats.syntax.apply._
+import cats.syntax.apply.*
 import com.google.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ErrorCode._
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ReturnStatus._
-import uk.gov.hmrc.hecstubs.models.accountOverviewDetails._
+import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ErrorCode.*
+import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ReturnStatus.*
+import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.*
 import uk.gov.hmrc.hecstubs.util.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 

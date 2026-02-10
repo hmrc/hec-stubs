@@ -22,6 +22,10 @@ final case class TaxIds(sautr: Option[String]) extends AnyVal
 
 object TaxIds {
 
-  implicit val writes: OWrites[TaxIds] = Json.writes[TaxIds]
+  implicit val writes: OWrites[TaxIds] = OWrites { taxIds =>
+    Json.obj(
+      "sautr" -> taxIds.sautr
+    )
+  }
 
 }

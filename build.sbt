@@ -19,12 +19,11 @@ lazy val microservice = Project(appName, file("."))
   .disablePlugins(JUnitXmlReportPlugin)
   .settings(
     majorVersion := 0,
-    scalaVersion := "2.13.16",
+    scalaVersion := "3.3.6",
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     scalacOptions := Seq(
-      "-Ymacro-annotations",
       "-Wconf:src=routes/.*:s", // Silence warnings in generated routes
-      "-Wconf:cat=unused-imports&src=html/.*:s", // Silence unused import warnings in twirl templates
+      "-Wconf:msg=unused.import&src=html/.*:s", // Silence unused import warnings in twirl templates
       "-Wunused:nowarn"
     ),
     Test / scalacOptions := Seq(

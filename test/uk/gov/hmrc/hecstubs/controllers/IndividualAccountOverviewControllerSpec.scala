@@ -16,15 +16,15 @@
 
 package uk.gov.hmrc.hecstubs.controllers
 
-import org.scalatest.matchers.must.Matchers.convertToAnyMustWrapper
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.matchers.must.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import uk.gov.hmrc.hecstubs.controllers.TestData._
+import play.api.test.Helpers.*
+import uk.gov.hmrc.hecstubs.controllers.TestData.*
 import java.util.UUID
 
 import uk.gov.hmrc.hecstubs.models.accountOverviewDetails.ReturnStatus.{NoReturnFound, NoticeToFileIssued, ReturnFound}

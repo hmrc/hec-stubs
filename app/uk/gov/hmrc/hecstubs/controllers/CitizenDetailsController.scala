@@ -19,7 +19,7 @@ package uk.gov.hmrc.hecstubs.controllers
 import com.google.inject.{Inject, Singleton}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.hecstubs.models.citizendetails._
+import uk.gov.hmrc.hecstubs.models.citizendetails.*
 import uk.gov.hmrc.hecstubs.util.Logging
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
